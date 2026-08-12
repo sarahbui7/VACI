@@ -407,7 +407,6 @@
                     // icon and a collapsed layout in place of the photo.
                     const img = new Image();
                     img.alt = slotEl.dataset.alt || '';
-                    img.loading = 'lazy';
 
                     img.onload = () => {
                         slotEl.innerHTML = '';
