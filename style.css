@@ -2,9 +2,9 @@
 
 :root {
     /* Core palette (as specified) */
-    --bg: #8C2F2A;
+    --bg: #5E130F;
     --bubble: #FFFFFF;
-    --text: #121345;
+    --text: #360200;
 
     /* Supporting accents, drawn from lion dance costuming: gold trim, red sash, drum-night blue */
     --gold: #F7B633;
@@ -13,7 +13,7 @@
     --red: #D8483F;
     --bg-deep: #611F1B;
     --bg-light: #A6453E;
-    --muted: #565a91;
+    --muted: #360200;
     --hairline: rgba(18, 19, 69, 0.12);
 
     --nav-height: 5.2rem;
@@ -120,8 +120,8 @@ a {
 }
 
 .nav-link.active {
-    background: rgba(140, 47, 42, 0.25);
-    border-color: var(--bg);
+    background: var(--red);
+    border-color: var(--red);
     color: #fff;
 }
 
@@ -364,9 +364,8 @@ a {
 
 .gallery-grid .admin-upload {
     flex: 0 0 auto;
-    width: 300px;
-    height: 350px;
-    aspect-ratio: unset;
+    height: 330px;
+    aspect-ratio: 4 / 3;
     scroll-snap-align: start;
 }
 
