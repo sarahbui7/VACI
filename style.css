@@ -2,18 +2,21 @@
 
 :root {
     /* Core palette (as specified) */
-    --bg: #3B408F;
+    --bg: #8C2F2A;
     --bubble: #FFFFFF;
     --text: #121345;
 
     /* Supporting accents, drawn from lion dance costuming: gold trim, red sash, drum-night blue */
-    --gold: #F2B134;
+    --gold: #F7B633;
     --gold-deep: #C98A16;
+    --gold-text: #704A00;
     --red: #D8483F;
-    --bg-deep: #2B2F6E;
-    --bg-light: #565BAA;
+    --bg-deep: #611F1B;
+    --bg-light: #A6453E;
     --muted: #565a91;
     --hairline: rgba(18, 19, 69, 0.12);
+
+    --nav-height: 5.2rem;
 
     --display: 'Fraunces', Georgia, serif;
     --body: 'Manrope', 'Segoe UI', Tahoma, sans-serif;
@@ -37,7 +40,7 @@ body {
         radial-gradient(circle at 88% 92%, var(--bg-deep) 0%, transparent 45%),
         var(--bg);
     min-height: 100vh;
-    padding-top: 5.2rem;
+    padding-top: var(--nav-height, 5.2rem);
     line-height: 1.6;
 }
 
@@ -65,7 +68,7 @@ a {
     flex-wrap: wrap;
     gap: 1rem;
     padding: 0.9rem 1.75rem;
-    background: var(--bubble);
+    background: #000;
     box-shadow: 0 12px 28px rgba(18, 19, 69, 0.22);
 }
 
@@ -80,7 +83,7 @@ a {
     font-family: var(--display);
     font-weight: 800;
     font-size: 1.25rem;
-    color: var(--text);
+    color: #fff;
     letter-spacing: -0.01em;
 }
 
@@ -100,24 +103,25 @@ a {
 }
 
 .nav-link {
-    border: 0;
+    border: 2px solid transparent;
     background: none;
     cursor: pointer;
     font: inherit;
     font-weight: 700;
     font-size: 0.92rem;
-    color: var(--text);
+    color: #fff;
     padding: 0.55rem 0.95rem;
     border-radius: 999px;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .nav-link:hover {
-    background: rgba(59, 64, 143, 0.08);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-link.active {
-    background: var(--bg);
+    background: rgba(140, 47, 42, 0.25);
+    border-color: var(--bg);
     color: #fff;
 }
 
@@ -268,7 +272,7 @@ a {
 
 .cta-button.gold {
     background: var(--gold);
-    color: #4a2f00;
+    color: var(--gold-text);
 }
 
 .cta-button.red {
@@ -348,9 +352,22 @@ a {
 }
 
 .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: flex;
+    flex-wrap: nowrap;
     gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.75rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+}
+
+.gallery-grid .admin-upload {
+    flex: 0 0 auto;
+    width: 300px;
+    height: 350px;
+    aspect-ratio: unset;
+    scroll-snap-align: start;
 }
 
 /* ---------- Sign-up form ---------- */
@@ -566,7 +583,7 @@ a {
 
 .timeline-item.upcoming .timeline-marker {
     background: var(--gold);
-    color: #4a2f00;
+    color: var(--gold-text);
 }
 
 .timeline-content {
