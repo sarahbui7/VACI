@@ -4,16 +4,14 @@
     /* Core palette (as specified) */
     --bg: #5E130F;
     --bubble: #FFFFFF;
-    --text: #360200;
+    --text: #4E0300;
 
     /* Supporting accents, drawn from lion dance costuming: gold trim, red sash, drum-night blue */
     --gold: #F7B633;
     --gold-deep: #C98A16;
     --gold-text: #704A00;
     --red: #D8483F;
-    --bg-deep: #611F1B;
-    --bg-light: #A6453E;
-    --muted: #360200;
+    --muted: #4E0300;
     --hairline: rgba(18, 19, 69, 0.12);
 
     --nav-height: 5.2rem;
@@ -35,10 +33,7 @@ html {
 body {
     font-family: var(--body);
     color: var(--text);
-    background:
-        radial-gradient(circle at 12% 8%, var(--bg-light) 0%, transparent 42%),
-        radial-gradient(circle at 88% 92%, var(--bg-deep) 0%, transparent 45%),
-        var(--bg);
+    background: var(--bg);
     min-height: 100vh;
     padding-top: var(--nav-height, 5.2rem);
     line-height: 1.6;
@@ -276,7 +271,7 @@ a {
 }
 
 .cta-button.red {
-    background: var(--red);
+    background: var(--bg);
     color: #fff;
 }
 
@@ -329,7 +324,8 @@ a {
     overflow: hidden;
 }
 
-.admin-upload.has-photo img {
+.admin-upload.has-photo img,
+.admin-upload.has-photo video {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -364,9 +360,14 @@ a {
 
 .gallery-grid .admin-upload {
     flex: 0 0 auto;
-    height: 330px;
+    width: 400px;
+    height: 300px;
     aspect-ratio: 4 / 3;
     scroll-snap-align: start;
+}
+
+.gallery-grid .admin-upload.has-photo img {
+    object-fit: contain;
 }
 
 /* ---------- Sign-up form ---------- */
@@ -512,10 +513,12 @@ a {
 }
 
 .performance-media {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
     margin-top: 1.75rem;
+    max-width: 640px;
+}
+
+.performance-media .admin-upload {
+    aspect-ratio: 16 / 9;
 }
 
 /* ---------- Timelines (Upcoming & Past Events) ---------- */
@@ -742,10 +745,6 @@ a {
 
     .button-row {
         justify-content: center;
-    }
-
-    .performance-media {
-        grid-template-columns: repeat(2, 1fr);
     }
 }
 
