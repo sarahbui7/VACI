@@ -6,6 +6,7 @@
     <title>VACI Lions — Photo Admin</title>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="firebase-config.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -111,7 +112,8 @@
         <p class="sub">Upload photos for the website — no code needed.</p>
 
         <div id="login-card" class="card">
-            <input type="password" id="password-input" placeholder="Enter admin password">
+            <input type="email" id="email-input" placeholder="Email" autocomplete="username">
+            <input type="password" id="password-input" placeholder="Password" autocomplete="current-password">
             <button id="login-btn" type="button">Log in</button>
             <p id="login-error" class="msg error"></p>
         </div>
@@ -143,6 +145,9 @@
             </div>
 
             <p id="status-msg" class="msg"></p>
+            <div style="text-align:center; margin-top: 1rem;">
+                <button id="logout-btn" type="button" style="background: transparent; color: #6a6a8f; font-weight: 600;">Log out</button>
+            </div>
         </div>
     </div>
 
@@ -171,46 +176,55 @@
         const statusMsg = document.getElementById('status-msg');
 
         let db = null;
+        let auth = null;
         let currentImages = {};
+        let slotsRendered = false;
+
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        auth = firebase.auth();
 
         document.getElementById('login-btn').addEventListener('click', tryLogin);
         document.getElementById('password-input').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') tryLogin();
         });
+        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
 
         function tryLogin() {
-            const val = document.getElementById('password-input').value;
-            if (val === ADMIN_PASSWORD) {
+            const email = document.getElementById('email-input').value.trim();
+            const pw = document.getElementById('password-input').value;
+            document.getElementById('login-error').textContent = '';
+            auth.signInWithEmailAndPassword(email, pw).catch((err) => {
+                document.getElementById('login-error').textContent = 'Login failed: ' + err.message;
+            });
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
                 loginCard.style.display = 'none';
                 app.style.display = 'block';
                 initAdmin();
             } else {
-                document.getElementById('login-error').textContent = 'Wrong password — try again.';
+                loginCard.style.display = 'block';
+                app.style.display = 'none';
             }
-        }
+        });
 
         function initAdmin() {
             const notConfigured =
-                firebaseConfig.apiKey.startsWith('PASTE_') ||
                 cloudinaryConfig.cloudName.startsWith('PASTE_') ||
                 cloudinaryConfig.uploadPreset.startsWith('PASTE_');
             document.getElementById('setup-warning').style.display = notConfigured ? 'block' : 'none';
 
-            try {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.firestore();
-            } catch (err) {
-                console.warn(err);
+            if (!slotsRendered) {
+                renderSlots();
+                slotsRendered = true;
             }
 
-            renderSlots();
-
-            if (db) {
-                db.collection('site').doc('images').get().then((doc) => {
-                    currentImages = doc.exists ? (doc.data() || {}) : {};
-                    SLOTS.forEach((slot) => updateThumb(slot.key));
-                }).catch((err) => console.warn('Could not load current images:', err));
-            }
+            db.collection('site').doc('images').get().then((doc) => {
+                currentImages = doc.exists ? (doc.data() || {}) : {};
+                SLOTS.forEach((slot) => updateThumb(slot.key));
+            }).catch((err) => console.warn('Could not load current images:', err));
         }
 
         function renderSlots() {
