@@ -22,11 +22,9 @@ const cloudinaryConfig = {
     cloudName: "kbn2frg6",
     uploadPreset: "vaci-lions-upload"
 };
-
 // ─────────────────────────────────────────────────────────────
-// ADMIN PASSWORD — a simple shared password for the admin page.
-// This is NOT real security (anyone who reads this file can see
-// it) — it just keeps random visitors from casually opening the
-// upload page. Change it to something only your team knows.
+// Admin login now uses real Firebase Authentication (email +
+// password), created in the Firebase Console under
+// Authentication → Users. There's no password stored in this
+// file anymore.
 // ─────────────────────────────────────────────────────────────
-// const ADMIN_PASSWORD = "changeme";
