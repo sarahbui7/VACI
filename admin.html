@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VACI Lions — Photo Admin</title>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #3B408F;
+            color: #121345;
+            min-height: 100vh;
+            padding: 2rem 1rem 4rem;
+        }
+        .wrap {
+            width: min(760px, 100%);
+            margin: 0 auto;
+        }
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+        .sub {
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: #fff;
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 14px 35px rgba(18,19,69,0.25);
+        }
+        #login-card input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 0.6rem;
+            border: 1.5px solid rgba(18,19,69,0.15);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        button {
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            border: 0;
+            border-radius: 0.7rem;
+            padding: 0.75rem 1.2rem;
+            background: #3B408F;
+            color: #fff;
+        }
+        button:hover { opacity: 0.9; }
+        #app { display: none; }
+        .group {
+            margin-bottom: 2.25rem;
+        }
+        .group h2 {
+            font-size: 1.1rem;
+            border-bottom: 2px solid rgba(18,19,69,0.1);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .slot-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(18,19,69,0.06);
+        }
+        .slot-row:last-child { border-bottom: none; }
+        .thumb {
+            width: 64px;
+            height: 64px;
+            border-radius: 0.6rem;
+            background: repeating-linear-gradient(135deg, #f3f3f8 0 8px, #e9e9f4 8px 16px);
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid rgba(18,19,69,0.1);
+        }
+        .slot-info { flex: 1; }
+        .slot-info .label { font-weight: 700; font-size: 0.95rem; }
+        .slot-info .status { font-size: 0.8rem; color: #6a6a8f; }
+        .slot-row input[type="file"] { max-width: 160px; font-size: 0.8rem; }
+        .msg {
+            margin-top: 2rem;
+            text-align: center;
+            font-weight: 600;
+            min-height: 1.5rem;
+        }
+        .msg.error { color: #b3261e; }
+        .msg.ok { color: #1e7a2f; }
+        .setup-warning {
+            background: #fff4e5;
+            border: 1px solid #f2b134;
+            border-radius: 0.8rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <h1>VACI Lions Photo Admin</h1>
+        <p class="sub">Upload photos for the website — no code needed.</p>
+
+        <div id="login-card" class="card">
+            <input type="password" id="password-input" placeholder="Enter admin password">
+            <button id="login-btn" type="button">Log in</button>
+            <p id="login-error" class="msg error"></p>
+        </div>
+
+        <div id="app" class="card">
+            <div id="setup-warning" class="setup-warning" style="display:none;">
+                ⚠️ Cloudinary and/or Firebase haven't been configured yet in <code>firebase-config.js</code>. Uploads won't work until that's filled in.
+            </div>
+
+            <div class="group">
+                <h2>Home Page</h2>
+                <div id="slots-home"></div>
+            </div>
+            <div class="group">
+                <h2>What We Do</h2>
+                <div id="slots-whatwedo"></div>
+            </div>
+            <div class="group">
+                <h2>Upcoming Events</h2>
+                <div id="slots-upcoming"></div>
+            </div>
+            <div class="group">
+                <h2>Past Events</h2>
+                <div id="slots-past"></div>
+            </div>
+            <div class="group">
+                <h2>Leaders &amp; Members</h2>
+                <div id="slots-roster"></div>
+            </div>
+
+            <p id="status-msg" class="msg"></p>
+        </div>
+    </div>
+
+    <script>
+        const SLOTS = [
+            { key: 'hero-photo',    label: 'Home — Featured photo',        group: 'slots-home' },
+            { key: 'gallery-1',     label: 'Home — Recent photo 1',        group: 'slots-home' },
+            { key: 'gallery-2',     label: 'Home — Recent photo 2',        group: 'slots-home' },
+            { key: 'gallery-3',     label: 'Home — Recent photo 3',        group: 'slots-home' },
+            { key: 'gallery-4',     label: 'Home — Recent photo 4',        group: 'slots-home' },
+            { key: 'performance-1', label: 'What We Do — Photo 1',         group: 'slots-whatwedo' },
+            { key: 'performance-2', label: 'What We Do — Photo 2',         group: 'slots-whatwedo' },
+            { key: 'performance-3', label: 'What We Do — Photo 3',         group: 'slots-whatwedo' },
+            { key: 'flyer',         label: 'Upcoming Events — Flyer',      group: 'slots-upcoming' },
+            { key: 'past-event-1',  label: 'Past Events — Photo 1',        group: 'slots-past' },
+            { key: 'past-event-2',  label: 'Past Events — Photo 2',        group: 'slots-past' },
+            { key: 'past-event-3',  label: 'Past Events — Photo 3',        group: 'slots-past' },
+            { key: 'leader-andy',   label: 'Team Leader — Andy Ta',        group: 'slots-roster' },
+            { key: 'leader-jordyn', label: 'Team Leader — Jordyn Cherniss', group: 'slots-roster' },
+            { key: 'leader-tosh',   label: 'Team Leader — Tosh Cherniss',  group: 'slots-roster' },
+            { key: 'leader-sarah',  label: 'Team Leader — Sarah Bui',      group: 'slots-roster' },
+        ];
+
+        const loginCard = document.getElementById('login-card');
+        const app = document.getElementById('app');
+        const statusMsg = document.getElementById('status-msg');
+
+        let db = null;
+        let currentImages = {};
+
+        document.getElementById('login-btn').addEventListener('click', tryLogin);
+        document.getElementById('password-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') tryLogin();
+        });
+
+        function tryLogin() {
+            const val = document.getElementById('password-input').value;
+            if (val === ADMIN_PASSWORD) {
+                loginCard.style.display = 'none';
+                app.style.display = 'block';
+                initAdmin();
+            } else {
+                document.getElementById('login-error').textContent = 'Wrong password — try again.';
+            }
+        }
+
+        function initAdmin() {
+            const notConfigured =
+                firebaseConfig.apiKey.startsWith('PASTE_') ||
+                cloudinaryConfig.cloudName.startsWith('PASTE_') ||
+                cloudinaryConfig.uploadPreset.startsWith('PASTE_');
+            document.getElementById('setup-warning').style.display = notConfigured ? 'block' : 'none';
+
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+            } catch (err) {
+                console.warn(err);
+            }
+
+            renderSlots();
+
+            if (db) {
+                db.collection('site').doc('images').get().then((doc) => {
+                    currentImages = doc.exists ? (doc.data() || {}) : {};
+                    SLOTS.forEach((slot) => updateThumb(slot.key));
+                }).catch((err) => console.warn('Could not load current images:', err));
+            }
+        }
+
+        function renderSlots() {
+            SLOTS.forEach((slot) => {
+                const row = document.createElement('div');
+                row.className = 'slot-row';
+                row.innerHTML = `
+                    <img class="thumb" id="thumb-${slot.key}" src="" alt="">
+                    <div class="slot-info">
+                        <div class="label">${slot.label}</div>
+                        <div class="status" id="status-${slot.key}">No photo yet</div>
+                    </div>
+                    <input type="file" accept="image/*" id="file-${slot.key}">
+                `;
+                document.getElementById(slot.group).appendChild(row);
+                document.getElementById(`file-${slot.key}`).addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                        uploadPhoto(slot.key, e.target.files[0]);
+                    }
+                });
+            });
+        }
+
+        function updateThumb(key) {
+            const thumbEl = document.getElementById(`thumb-${key}`);
+            const statusEl = document.getElementById(`status-${key}`);
+            const url = currentImages[key];
+            if (url) {
+                thumbEl.src = url;
+                statusEl.textContent = 'Current photo set';
+            } else {
+                thumbEl.src = '';
+                statusEl.textContent = 'No photo yet';
+            }
+        }
+
+        async function uploadPhoto(key, file) {
+            statusMsg.textContent = 'Uploading…';
+            statusMsg.className = 'msg';
+            document.getElementById(`status-${key}`).textContent = 'Uploading…';
+
+            try {
+                const url = await uploadToCloudinary(file);
+                if (db) {
+                    await db.collection('site').doc('images').set({ [key]: url }, { merge: true });
+                }
+                currentImages[key] = url;
+                updateThumb(key);
+                statusMsg.textContent = 'Uploaded! The website will show this photo the next time it loads.';
+                statusMsg.className = 'msg ok';
+            } catch (err) {
+                console.error(err);
+                statusMsg.textContent = 'Upload failed — check the setup in firebase-config.js.';
+                statusMsg.className = 'msg error';
+                document.getElementById(`status-${key}`).textContent = 'Upload failed';
+            }
+        }
+
+        function uploadToCloudinary(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+            return fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, {
+                method: 'POST',
+                body: formData,
+            })
+            .then((res) => {
+                if (!res.ok) throw new Error('Cloudinary upload failed');
+                return res.json();
+            })
+            .then((data) => data.secure_url);
+        }
+    </script>
+</body>
+</html>
