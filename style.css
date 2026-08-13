@@ -197,7 +197,7 @@ a {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 1.5rem;
     overflow: hidden;
 }
 
@@ -212,7 +212,7 @@ a {
 }
 
 .hero-text {
-    flex: 0 1 26rem;
+    flex: 1 1 26rem;
     position: relative;
     z-index: 1;
 }
@@ -283,10 +283,9 @@ a {
 }
 
 .hero-figure {
-    flex: 0 1 clamp(15rem, 28vw, 385px);
+    flex: 0 0 clamp(15rem, 28vw, 385px);
     width: clamp(15rem, 28vw, 385px);
     max-width: 385px;
-    margin: 0 auto;
     position: relative;
     z-index: 1;
 }
@@ -740,10 +739,6 @@ a {
     .hero {
         flex-direction: column;
         text-align: center;
-    }
-
-    .hero-figure {
-        margin: 1.5rem auto 0;
     }
 
     .hero-text p {
