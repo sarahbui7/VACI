@@ -525,61 +525,6 @@ a {
 
 /* ---------- Timelines (Upcoming & Past Events) ---------- */
 
-.flyer-slot {
-    margin-bottom: 2rem;
-}
-
-.flyer-slot .admin-upload {
-    aspect-ratio: 16 / 10;
-    max-width: 30rem;
-    margin: 0 auto;
-}
-
-.flyer-caption {
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.85rem;
-    margin-top: 0.6rem;
-}
-
-/* Upcoming Events: flyer + timeline side-by-side layout.
-   Flyer column is fixed at 240px, timeline column is fixed at 843px,
-   with a 30px gap between them (240 + 30 + 843 = 1113px total). Above
-   that width the columns hold their sizes; below it, both flex-shrink
-   proportionally together rather than one column collapsing first. */
-.upcoming-layout {
-    display: flex;
-    align-items: flex-start;
-    gap: 30px;
-    max-width: 1098px;
-    margin: 0 auto;
-}
-
-.flyer-col {
-    flex: 225 1 225px;
-    min-width: 0;
-}
-
-.timeline-col {
-    flex: 843 1 843px;
-    min-width: 0;
-}
-
-.flyer-col .flyer-slot {
-    margin-bottom: 0;
-}
-
-.flyer-col .admin-upload {
-    width: 100%;
-    max-width: 225px;
-    aspect-ratio: 9 / 16;
-    margin: 0;
-}
-
-.timeline-col > h2 {
-    margin-top: 0;
-}
-
 .timeline {
     position: relative;
     display: flex;
@@ -827,21 +772,5 @@ a {
     .past-event-card .admin-upload {
         flex: none;
         width: 9rem;
-    }
-
-    .upcoming-layout {
-        flex-direction: column;
-    }
-
-    .flyer-col {
-        flex-basis: auto;
-        width: 100%;
-        max-width: 20rem;
-        margin: 0 auto;
-    }
-
-    .timeline-col {
-        flex-basis: auto;
-        width: 100%;
     }
 }
