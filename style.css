@@ -186,9 +186,10 @@ a {
 }
 
 .divider img {
-    width: min(90%, 640px);
+    width: auto;
     height: auto;
-    max-height: 500px;
+    max-width: min(90%, 640px);
+    max-height: 100px;
     display: block;
 }
 
