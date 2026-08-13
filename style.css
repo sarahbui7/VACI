@@ -212,7 +212,8 @@ a {
 }
 
 .hero-text {
-    flex: 1 1 26rem;
+    flex: 0 1 26rem;
+    max-width: 34rem;
     position: relative;
     z-index: 1;
 }
