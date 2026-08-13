@@ -125,18 +125,16 @@
                     </div>
                 </div>
 
+                <div class="button-row" style="margin-top: 2rem;">
+                    <a href="#booking" data-tab="home" class="cta-button red">Book us for an event</a>
+                </div>
+
                 <div class="section-block">
                     <h2>Behind the Dance</h2>
                     <p class="lede">We practice often to get our routines to be sychronized. Starting from drumming, to cymballing, then dancing in time together.</p>
                     <div class="performance-media">
-                        <div class="admin-upload" data-slot="performance-1" data-alt="VACI Lions performance photo"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-11 9"/></svg>Photo</div>
-                        <div class="admin-upload" data-slot="performance-2" data-alt="VACI Lions performance photo"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-11 9"/></svg>Photo</div>
-                        <div class="admin-upload" data-slot="performance-3" data-alt="VACI Lions performance photo"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-11 9"/></svg>Photo</div>
+                        <div class="admin-upload" data-slot="performance-video" data-type="video" data-alt="VACI Lions performance video"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-11 9"/></svg>Video</div>
                     </div>
-                </div>
-
-                <div class="button-row" style="margin-top: 2rem;">
-                    <a href="#booking" data-tab="home" class="cta-button red">Book us for an event</a>
                 </div>
             </div>
         </section>
@@ -410,7 +408,7 @@
 
         showTab('home');
 
-        // ---- Load admin-uploaded photos from Firestore ----
+        // ---- Load admin-uploaded photos & video from Firestore ----
         try {
             firebase.initializeApp(firebaseConfig);
             const db = firebase.firestore();
@@ -420,6 +418,38 @@
                 document.querySelectorAll('[data-slot]').forEach((slotEl) => {
                     const url = data[slotEl.dataset.slot];
                     if (!url) return;
+
+                    if (slotEl.dataset.type === 'video') {
+                        // Preload the video off-DOM first, same idea as the
+                        // image case below: only swap it in once we know it
+                        // can actually play, so a bad/expired URL leaves the
+                        // placeholder in place instead of a broken player.
+                        const video = document.createElement('video');
+                        video.muted = true;
+                        video.loop = true;
+                        video.autoplay = true;
+                        video.playsInline = true;
+                        video.setAttribute('playsinline', '');
+                        video.setAttribute('aria-label', slotEl.dataset.alt || '');
+                        video.preload = 'auto';
+
+                        video.oncanplaythrough = () => {
+                            slotEl.innerHTML = '';
+                            slotEl.classList.add('has-photo');
+                            slotEl.appendChild(video);
+                            video.play().catch(() => {});
+                        };
+
+                        video.onerror = () => {
+                            console.warn(
+                                `[VACI Lions] Video failed to load for slot "${slotEl.dataset.slot}". ` +
+                                `Stored URL: ${url}. Keeping the placeholder in place.`
+                            );
+                        };
+
+                        video.src = url;
+                        return;
+                    }
 
                     // Preload the image off-DOM first. Only swap it into the
                     // placeholder once we KNOW it loaded successfully — this
@@ -440,7 +470,7 @@
                             `Stored URL: ${url}. Keeping the placeholder in place.`
                         );
                         // slotEl is left untouched, so the original
-                        // "Admin upload" placeholder stays visible instead
+                        // "Photo" placeholder stays visible instead
                         // of a broken image.
                     };
 

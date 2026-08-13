@@ -10,7 +10,7 @@
     --gold: #F7B633;
     --gold-deep: #C98A16;
     --gold-text: #704A00;
-    --red: #D8483F;
+    --red: #8C2F2A;
     --muted: #4E0300;
     --hairline: rgba(18, 19, 69, 0.12);
 
@@ -271,7 +271,7 @@ a {
 }
 
 .cta-button.red {
-    background: var(--bg);
+    background: var(--red);
     color: #fff;
 }
 
@@ -618,7 +618,7 @@ a {
 
 .past-event-card .admin-upload {
     flex: 0 0 9rem;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 3;
     border-radius: 0.9rem;
 }
 

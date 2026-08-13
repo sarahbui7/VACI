@@ -158,9 +158,7 @@
             { key: 'gallery-2',     label: 'Home: Recent photo 2',        group: 'slots-home' },
             { key: 'gallery-3',     label: 'Home: Recent photo 3',        group: 'slots-home' },
             { key: 'gallery-4',     label: 'Home: Recent photo 4',        group: 'slots-home' },
-            { key: 'performance-1', label: 'What We Do: Photo 1',         group: 'slots-whatwedo' },
-            { key: 'performance-2', label: 'What We Do: Photo 2',         group: 'slots-whatwedo' },
-            { key: 'performance-3', label: 'What We Do: Photo 3',         group: 'slots-whatwedo' },
+            { key: 'performance-video', label: 'What We Do: Behind the Dance video', group: 'slots-whatwedo', type: 'video' },
             { key: 'flyer',         label: 'Upcoming Events: Flyer',      group: 'slots-upcoming' },
             { key: 'past-event-1',  label: 'Past Events: Photo 1',        group: 'slots-past' },
             { key: 'past-event-2',  label: 'Past Events: Photo 2',        group: 'slots-past' },
@@ -229,51 +227,58 @@
 
         function renderSlots() {
             SLOTS.forEach((slot) => {
+                const isVideo = slot.type === 'video';
                 const row = document.createElement('div');
                 row.className = 'slot-row';
                 row.innerHTML = `
-                    <img class="thumb" id="thumb-${slot.key}" src="" alt="">
+                    ${isVideo
+                        ? `<video class="thumb" id="thumb-${slot.key}" muted playsinline></video>`
+                        : `<img class="thumb" id="thumb-${slot.key}" src="" alt="">`}
                     <div class="slot-info">
                         <div class="label">${slot.label}</div>
-                        <div class="status" id="status-${slot.key}">No photo yet</div>
+                        <div class="status" id="status-${slot.key}">${isVideo ? 'No video yet' : 'No photo yet'}</div>
                     </div>
-                    <input type="file" accept="image/*" id="file-${slot.key}">
+                    <input type="file" accept="${isVideo ? 'video/*' : 'image/*'}" id="file-${slot.key}">
                 `;
                 document.getElementById(slot.group).appendChild(row);
                 document.getElementById(`file-${slot.key}`).addEventListener('change', (e) => {
                     if (e.target.files && e.target.files[0]) {
-                        uploadPhoto(slot.key, e.target.files[0]);
+                        uploadPhoto(slot.key, e.target.files[0], isVideo);
                     }
                 });
             });
         }
 
         function updateThumb(key) {
+            const slot = SLOTS.find((s) => s.key === key);
+            const isVideo = slot && slot.type === 'video';
             const thumbEl = document.getElementById(`thumb-${key}`);
             const statusEl = document.getElementById(`status-${key}`);
             const url = currentImages[key];
             if (url) {
                 thumbEl.src = url;
-                statusEl.textContent = 'Current photo set';
+                statusEl.textContent = isVideo ? 'Current video set' : 'Current photo set';
             } else {
-                thumbEl.src = '';
-                statusEl.textContent = 'No photo yet';
+                thumbEl.removeAttribute('src');
+                statusEl.textContent = isVideo ? 'No video yet' : 'No photo yet';
             }
         }
 
-        async function uploadPhoto(key, file) {
+        async function uploadPhoto(key, file, isVideo) {
             statusMsg.textContent = 'Uploading…';
             statusMsg.className = 'msg';
             document.getElementById(`status-${key}`).textContent = 'Uploading…';
 
             try {
-                const url = await uploadToCloudinary(file);
+                const url = await uploadToCloudinary(file, isVideo);
                 if (db) {
                     await db.collection('site').doc('images').set({ [key]: url }, { merge: true });
                 }
                 currentImages[key] = url;
                 updateThumb(key);
-                statusMsg.textContent = 'Uploaded! The website will show this photo the next time it loads.';
+                statusMsg.textContent = isVideo
+                    ? 'Uploaded! The website will show this video the next time it loads.'
+                    : 'Uploaded! The website will show this photo the next time it loads.';
                 statusMsg.className = 'msg ok';
             } catch (err) {
                 console.error(err);
@@ -283,11 +288,12 @@
             }
         }
 
-        function uploadToCloudinary(file) {
+        function uploadToCloudinary(file, isVideo) {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', cloudinaryConfig.uploadPreset);
-            return fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, {
+            const resourceType = isVideo ? 'video' : 'image';
+            return fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/${resourceType}/upload`, {
                 method: 'POST',
                 body: formData,
             })
