@@ -195,7 +195,8 @@ a {
 
 .hero {
     position: relative;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
     gap: 2rem;
     overflow: hidden;
@@ -212,10 +213,9 @@ a {
 }
 
 .hero-text {
-    flex: 1 1 400px;
-    max-width: 400px;
     position: relative;
     z-index: 1;
+    min-width: 0;
 }
 
 .hero-text .eyebrow {
@@ -284,10 +284,9 @@ a {
 }
 
 .hero-figure {
-    flex: 1 1 400px;
-    max-width: 400px;
     position: relative;
     z-index: 1;
+    min-width: 0;
 }
 
 .admin-upload {
@@ -317,6 +316,8 @@ a {
 .hero-figure .admin-upload {
     aspect-ratio: 1 / 1;
     border-radius: 50%;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 .admin-upload.has-photo {
@@ -737,13 +738,8 @@ a {
     }
 
     .hero {
-        flex-direction: column;
+        grid-template-columns: 1fr;
         text-align: center;
-    }
-
-    .hero-figure {
-        width: 100%;
-        max-width: 400px;
     }
 
     .hero-text p {
