@@ -212,8 +212,8 @@ a {
 }
 
 .hero-text {
-    flex: 0 1 26rem;
-    max-width: 34rem;
+    flex: 0 1 504px;
+    max-width: 504px;
     position: relative;
     z-index: 1;
 }
@@ -284,9 +284,9 @@ a {
 }
 
 .hero-figure {
-    flex: 0 0 385px;
-    width: 385px;
-    max-width: 385px;
+    flex: 0 0 504px;
+    width: 504px;
+    max-width: 504px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -743,11 +743,6 @@ a {
         text-align: center;
     }
 
-    .hero-figure {
-        flex: 0 0 auto;
-        width: clamp(15rem, 70vw, 385px);
-    }
-
     .hero-text p {
         margin-left: auto;
         margin-right: auto;
@@ -755,6 +750,13 @@ a {
 
     .button-row {
         justify-content: center;
+    }
+}
+
+@media (max-width: 390px) {
+    .hero-figure {
+        width: 100%;
+        max-width: 385px;
     }
 }
 
