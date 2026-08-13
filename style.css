@@ -551,12 +551,12 @@ a {
     display: flex;
     align-items: flex-start;
     gap: 30px;
-    max-width: 1113px;
+    max-width: 1098px;
     margin: 0 auto;
 }
 
 .flyer-col {
-    flex: 240 1 240px;
+    flex: 225 1 225px;
     min-width: 0;
 }
 
@@ -571,8 +571,8 @@ a {
 
 .flyer-col .admin-upload {
     width: 100%;
-    aspect-ratio: 16 / 9;
-    max-width: none;
+    max-width: 225px;
+    aspect-ratio: 9 / 16;
     margin: 0;
 }
 
@@ -663,7 +663,7 @@ a {
 }
 
 .past-event-card .admin-upload {
-    flex: 0 0 9rem;
+    flex: 0 0 200px;
     aspect-ratio: 4 / 3;
     border-radius: 0.9rem;
 }
