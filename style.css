@@ -185,9 +185,10 @@ a {
     color: var(--gold);
 }
 
-.divider svg {
-    width: 9rem;
+.divider img {
     height: 1.1rem;
+    width: auto;
+    display: block;
 }
 
 /* ---------- Home ---------- */
