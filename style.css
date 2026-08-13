@@ -197,7 +197,7 @@ a {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 2.5rem;
+    gap: 0;
     overflow: hidden;
 }
 
@@ -212,7 +212,7 @@ a {
 }
 
 .hero-text {
-    flex: 1 1 26rem;
+    flex: 0 1 26rem;
     position: relative;
     z-index: 1;
 }
@@ -286,6 +286,7 @@ a {
     flex: 0 1 clamp(15rem, 28vw, 385px);
     width: clamp(15rem, 28vw, 385px);
     max-width: 385px;
+    margin: 0 auto;
     position: relative;
     z-index: 1;
 }
@@ -739,6 +740,10 @@ a {
     .hero {
         flex-direction: column;
         text-align: center;
+    }
+
+    .hero-figure {
+        margin: 1.5rem auto 0;
     }
 
     .hero-text p {
