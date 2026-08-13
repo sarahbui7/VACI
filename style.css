@@ -188,6 +188,7 @@ a {
 .divider img {
     width: min(90%, 640px);
     height: auto;
+    max-height: 500px;
     display: block;
 }
 
