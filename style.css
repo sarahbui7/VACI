@@ -182,6 +182,7 @@ a {
     display: flex;
     justify-content: center;
     margin: 1.75rem 0;
+    color: var(--text);
     opacity: 0.85;
 }
 
@@ -282,7 +283,9 @@ a {
 }
 
 .hero-figure {
-    flex: 0 0 15rem;
+    flex: 0 1 clamp(15rem, 28vw, 385px);
+    width: clamp(15rem, 28vw, 385px);
+    max-width: 385px;
     position: relative;
     z-index: 1;
 }
@@ -367,7 +370,7 @@ a {
 }
 
 .gallery-grid .admin-upload.has-photo img {
-    object-fit: contain;
+    object-fit: cover;
 }
 
 /* ---------- Sign-up form ---------- */
