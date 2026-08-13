@@ -181,13 +181,13 @@ a {
 .divider {
     display: flex;
     justify-content: center;
-    margin: 1.75rem 0;
+    margin: 2.5rem 0;
     color: var(--gold);
 }
 
 .divider img {
-    height: 1.1rem;
-    width: auto;
+    width: min(90%, 640px);
+    height: auto;
     display: block;
 }
 
