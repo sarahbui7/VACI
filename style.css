@@ -197,7 +197,7 @@ a {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 2rem;
     overflow: hidden;
 }
 
@@ -212,8 +212,8 @@ a {
 }
 
 .hero-text {
-    flex: 0 1 504px;
-    max-width: 504px;
+    flex: 1 1 400px;
+    max-width: 400px;
     position: relative;
     z-index: 1;
 }
@@ -284,10 +284,8 @@ a {
 }
 
 .hero-figure {
-    flex: 0 0 400px;
-    width: 400px;
+    flex: 1 1 400px;
     max-width: 400px;
-    margin: 0 auto;
     position: relative;
     z-index: 1;
 }
@@ -743,6 +741,11 @@ a {
         text-align: center;
     }
 
+    .hero-figure {
+        width: 100%;
+        max-width: 400px;
+    }
+
     .hero-text p {
         margin-left: auto;
         margin-right: auto;
@@ -750,13 +753,6 @@ a {
 
     .button-row {
         justify-content: center;
-    }
-}
-
-@media (max-width: 410px) {
-    .hero-figure {
-        width: 100%;
-        max-width: 400px;
     }
 }
 
