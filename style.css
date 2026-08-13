@@ -284,9 +284,9 @@ a {
 }
 
 .hero-figure {
-    flex: 0 0 504px;
-    width: 504px;
-    max-width: 504px;
+    flex: 0 0 400px;
+    width: 400px;
+    max-width: 400px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -753,10 +753,10 @@ a {
     }
 }
 
-@media (max-width: 390px) {
+@media (max-width: 410px) {
     .hero-figure {
         width: 100%;
-        max-width: 385px;
+        max-width: 400px;
     }
 }
 
