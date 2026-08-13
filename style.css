@@ -284,8 +284,8 @@ a {
 }
 
 .hero-figure {
-    flex: 0 0 clamp(15rem, 28vw, 385px);
-    width: clamp(15rem, 28vw, 385px);
+    flex: 0 0 385px;
+    width: 385px;
     max-width: 385px;
     margin: 0 auto;
     position: relative;
@@ -741,6 +741,11 @@ a {
     .hero {
         flex-direction: column;
         text-align: center;
+    }
+
+    .hero-figure {
+        flex: 0 0 auto;
+        width: clamp(15rem, 70vw, 385px);
     }
 
     .hero-text p {
