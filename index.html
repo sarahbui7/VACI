@@ -148,31 +148,8 @@
 
             <div class="bubble">
                 <h2>Planned Events</h2>
-                <div class="timeline">
-                    <div class="timeline-item upcoming">
-                        <div class="timeline-marker">1</div>
-                        <div class="timeline-content">
-                            <h3>World Food & Music Festival</h3>
-                            <p class="timeline-meta">August 29th • Western Gateway Park in Des Moines</p>
-                            <p>This event features international street cuisine, cooking demonstrations, and live music with free admission.</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item upcoming">
-                        <div class="timeline-marker">2</div>
-                        <div class="timeline-content">
-                            <h3>Multi-Cultural Festival</h3>
-                            <p class="timeline-meta">September 12th • Des Moines</p>
-                            <p>A parade where different communities can show their culture.</p>
-                        </div>
-                    </div>
-                    <div class="timeline-item upcoming">
-                        <div class="timeline-marker">3</div>
-                        <div class="timeline-content">
-                            <h3>American College of Osteopathic Family Physicians (acofp)</h3>
-                            <p class="timeline-meta">September 18th • Des Moines University</p>
-                            <p>This events helps offers an abundance of opportunities for colunteering, as well as sponsors a mentoring program, access to preceptors, Gand more.</p>
-                        </div>
-                    </div>
+                <div class="timeline" id="upcoming-timeline">
+                    <p class="events-loading">Loading events…</p>
                 </div>
 
                 <div class="button-row" style="margin-top: 2rem;">
@@ -202,46 +179,8 @@
             </div>
 
             <div class="bubble">
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-marker">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <div class="timeline-content past-event-card">
-                            <div class="admin-upload" data-slot="past-event-1" data-alt="Past event photo"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-11 9"/></svg>Photo</div>
-                            <div>
-                                <h3>World Refugee Day</h3>
-                                <p class="timeline-meta">June 20th 2026</p>
-                                <p>A great performance where we celebrated refugees around the globe.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <div class="timeline-content past-event-card">
-                            <div class="admin-upload" data-slot="past-event-2" data-alt="Past event photo"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-11 9"/></svg>Photo</div>
-                            <div>
-                                <h3>Glen Meadows</h3>
-                                <p class="timeline-meta">May 28th 2026</p>
-                                <p>Bringing energy and showing our cultural to the Glen Meadows Retirement Center!</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-marker">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <div class="timeline-content past-event-card">
-                            <div class="admin-upload" data-slot="past-event-3" data-alt="Past event photo"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-11 9"/></svg>Photo</div>
-                            <div>
-                                <h3>CelebrAsian</h3>
-                                <p class="timeline-meta">May 22nd-23rd 2026</p>
-                                <p>Being able to perform for multiple performances per day, and bringing in an excited crowd for each!</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="timeline" id="past-timeline">
+                    <p class="events-loading">Loading events…</p>
                 </div>
             </div>
         </section>
@@ -408,10 +347,125 @@
 
         showTab('home');
 
+        // ---- Render Upcoming & Past events from Firestore data ----
+        // Both sections are edited from the admin page — this just turns
+        // whatever's stored in Firestore into the timeline markup. Text is
+        // inserted with textContent (never innerHTML) so nothing an admin
+        // types can break the page.
+        function renderUpcomingEvents(events) {
+            const container = document.getElementById('upcoming-timeline');
+            container.innerHTML = '';
+
+            if (!events || events.length === 0) {
+                const empty = document.createElement('p');
+                empty.className = 'events-empty';
+                empty.textContent = 'No upcoming events scheduled right now — check back soon!';
+                container.appendChild(empty);
+                return;
+            }
+
+            events.forEach((ev, i) => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item upcoming';
+
+                const marker = document.createElement('div');
+                marker.className = 'timeline-marker';
+                marker.textContent = String(i + 1);
+
+                const content = document.createElement('div');
+                content.className = 'timeline-content';
+
+                const title = document.createElement('h3');
+                title.textContent = ev.title || '';
+
+                const meta = document.createElement('p');
+                meta.className = 'timeline-meta';
+                meta.textContent = ev.date || '';
+
+                const desc = document.createElement('p');
+                desc.textContent = ev.description || '';
+
+                content.appendChild(title);
+                content.appendChild(meta);
+                content.appendChild(desc);
+                item.appendChild(marker);
+                item.appendChild(content);
+                container.appendChild(item);
+            });
+        }
+
+        function renderPastEvents(events) {
+            const container = document.getElementById('past-timeline');
+            container.innerHTML = '';
+
+            if (!events || events.length === 0) {
+                const empty = document.createElement('p');
+                empty.className = 'events-empty';
+                empty.textContent = 'No past events posted yet — check back soon!';
+                container.appendChild(empty);
+                return;
+            }
+
+            events.forEach((ev) => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+
+                const marker = document.createElement('div');
+                marker.className = 'timeline-marker';
+                marker.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>';
+
+                const card = document.createElement('div');
+                card.className = 'timeline-content past-event-card';
+
+                const photo = document.createElement('div');
+                photo.className = 'admin-upload';
+                if (ev.photoUrl) {
+                    const img = document.createElement('img');
+                    img.src = ev.photoUrl;
+                    img.alt = ev.title ? (ev.title + ' photo') : 'Past event photo';
+                    photo.classList.add('has-photo');
+                    photo.appendChild(img);
+                } else {
+                    photo.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 15l-5-5-11 9"/></svg>Photo';
+                }
+
+                const textWrap = document.createElement('div');
+                const title = document.createElement('h3');
+                title.textContent = ev.title || '';
+                const meta = document.createElement('p');
+                meta.className = 'timeline-meta';
+                meta.textContent = ev.date || '';
+                const desc = document.createElement('p');
+                desc.textContent = ev.description || '';
+                textWrap.appendChild(title);
+                textWrap.appendChild(meta);
+                textWrap.appendChild(desc);
+
+                card.appendChild(photo);
+                card.appendChild(textWrap);
+                item.appendChild(marker);
+                item.appendChild(card);
+                container.appendChild(item);
+            });
+        }
+
         // ---- Load admin-uploaded photos & video from Firestore ----
         try {
             firebase.initializeApp(firebaseConfig);
             const db = firebase.firestore();
+
+            db.collection('site').doc('events').get().then((doc) => {
+                const data = doc.exists ? (doc.data() || {}) : {};
+                renderUpcomingEvents(data.upcoming || []);
+                renderPastEvents(data.past || []);
+            }).catch((err) => {
+                console.warn('Could not load events from Firestore:', err);
+                document.getElementById('upcoming-timeline').innerHTML =
+                    '<p class="events-empty">Couldn\'t load events right now.</p>';
+                document.getElementById('past-timeline').innerHTML =
+                    '<p class="events-empty">Couldn\'t load events right now.</p>';
+            });
+
             db.collection('site').doc('images').get().then((doc) => {
                 if (!doc.exists) return;
                 const data = doc.data() || {};

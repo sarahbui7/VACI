@@ -627,6 +627,12 @@ a {
     font-size: 0.95rem;
 }
 
+.events-loading,
+.events-empty {
+    color: var(--muted);
+    font-style: italic;
+}
+
 .past-event-card {
     display: flex;
     gap: 1.25rem;

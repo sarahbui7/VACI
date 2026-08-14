@@ -104,6 +104,107 @@
             margin-bottom: 1.5rem;
             font-size: 0.9rem;
         }
+        .group-hint {
+            font-size: 0.85rem;
+            color: #6a6a8f;
+            margin-top: -0.5rem;
+            margin-bottom: 1rem;
+        }
+        .event-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(18,19,69,0.06);
+        }
+        .event-row:last-of-type { border-bottom: none; }
+        .event-photo {
+            flex-shrink: 0;
+            width: 96px;
+            text-align: center;
+        }
+        .event-thumb {
+            width: 96px;
+            height: 72px;
+            border-radius: 0.6rem;
+            object-fit: cover;
+            background: repeating-linear-gradient(135deg, #f3f3f8 0 8px, #e9e9f4 8px 16px);
+            border: 1px solid rgba(18,19,69,0.1);
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+        .event-photo input[type="file"] {
+            font-size: 0.7rem;
+            width: 96px;
+        }
+        .event-fields {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            min-width: 0;
+        }
+        .event-fields label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #451212;
+        }
+        .event-fields input[type="text"],
+        .event-fields textarea {
+            font: inherit;
+            font-weight: 400;
+            padding: 0.55rem 0.7rem;
+            border-radius: 0.5rem;
+            border: 1.5px solid rgba(18,19,69,0.15);
+            font-size: 0.92rem;
+        }
+        .event-fields textarea {
+            resize: vertical;
+            min-height: 3.5rem;
+        }
+        .event-row-actions {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .remove-btn {
+            background: transparent;
+            color: #b3261e;
+            border: 1.5px solid #b3261e;
+            font-size: 0.78rem;
+            padding: 0.45rem 0.7rem;
+        }
+        .remove-btn:hover { background: #fdecea; opacity: 1; }
+        .move-btn {
+            background: transparent;
+            color: #6a6a8f;
+            border: 1.5px solid rgba(18,19,69,0.15);
+            font-size: 0.78rem;
+            padding: 0.35rem 0.6rem;
+        }
+        .move-btn:hover { background: rgba(18,19,69,0.05); opacity: 1; }
+        .event-actions-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .secondary-btn {
+            background: transparent;
+            color: #8f3b3b;
+            border: 1.5px solid #8f3b3b;
+        }
+        .secondary-btn:hover { background: rgba(143,59,59,0.08); opacity: 1; }
+        .empty-note {
+            color: #6a6a8f;
+            font-size: 0.9rem;
+            font-style: italic;
+            padding: 0.5rem 0;
+        }
     </style>
 </head>
 <body>
@@ -132,12 +233,30 @@
                 <div id="slots-whatwedo"></div>
             </div>
             <div class="group">
-                <h2>Past Events</h2>
-                <div id="slots-past"></div>
-            </div>
-            <div class="group">
                 <h2>Leaders &amp; Members</h2>
                 <div id="slots-roster"></div>
+            </div>
+
+            <div class="group">
+                <h2>Upcoming Events</h2>
+                <p class="group-hint">These show up on the "Upcoming Events" page, in order.</p>
+                <div id="upcoming-events-list"></div>
+                <div class="event-actions-row">
+                    <button id="add-upcoming-btn" type="button" class="secondary-btn">+ Add Event</button>
+                    <button id="save-upcoming-btn" type="button">Save Upcoming Events</button>
+                </div>
+                <p id="upcoming-save-msg" class="msg"></p>
+            </div>
+
+            <div class="group">
+                <h2>Past Events</h2>
+                <p class="group-hint">These show up on the "Past Events" page, each with its own photo.</p>
+                <div id="past-events-list"></div>
+                <div class="event-actions-row">
+                    <button id="add-past-btn" type="button" class="secondary-btn">+ Add Event</button>
+                    <button id="save-past-btn" type="button">Save Past Events</button>
+                </div>
+                <p id="past-save-msg" class="msg"></p>
             </div>
 
             <p id="status-msg" class="msg"></p>
@@ -155,9 +274,6 @@
             { key: 'gallery-3',     label: '4x3: Recent photo 3',              group: 'slots-home' },
             { key: 'gallery-4',     label: '4x3: Recent photo 4',              group: 'slots-home' },
             { key: 'performance-video', label: '16x9: Behind the Dance video', group: 'slots-whatwedo', type: 'video' },
-            { key: 'past-event-1',  label: '4x3: Photo 1',                     group: 'slots-past' },
-            { key: 'past-event-2',  label: '4x3: Photo 2',                     group: 'slots-past' },
-            { key: 'past-event-3',  label: '4x3: Photo 3',                     group: 'slots-past' },
             { key: 'leader-andy',   label: 'Circle 1x1: Andy Ta',              group: 'slots-roster' },
             { key: 'leader-jordyn', label: 'Circle 1x1: Jordyn Cherniss',      group: 'slots-roster' },
             { key: 'leader-tosh',   label: 'Circle 1x1: Tosh Cherniss',        group: 'slots-roster' },
@@ -172,6 +288,8 @@
         let auth = null;
         let currentImages = {};
         let slotsRendered = false;
+        let upcomingEvents = [];
+        let pastEvents = [];
 
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
@@ -218,7 +336,214 @@
                 currentImages = doc.exists ? (doc.data() || {}) : {};
                 SLOTS.forEach((slot) => updateThumb(slot.key));
             }).catch((err) => console.warn('Could not load current images:', err));
+
+            db.collection('site').doc('events').get().then((doc) => {
+                const data = doc.exists ? (doc.data() || {}) : {};
+                upcomingEvents = Array.isArray(data.upcoming) ? data.upcoming : [];
+                pastEvents = Array.isArray(data.past) ? data.past : [];
+                renderUpcomingList();
+                renderPastList();
+            }).catch((err) => console.warn('Could not load events:', err));
         }
+
+        // ---------------- Upcoming Events ----------------
+
+        function renderUpcomingList() {
+            const listEl = document.getElementById('upcoming-events-list');
+            listEl.innerHTML = '';
+
+            if (upcomingEvents.length === 0) {
+                listEl.innerHTML = '<p class="empty-note">No upcoming events yet. Click "+ Add Event" to add one.</p>';
+                return;
+            }
+
+            upcomingEvents.forEach((ev, index) => {
+                const row = document.createElement('div');
+                row.className = 'event-row';
+                row.innerHTML = `
+                    <div class="event-fields">
+                        <label>Title
+                            <input type="text" class="ev-title" placeholder="e.g. World Food & Music Festival">
+                        </label>
+                        <label>Date &amp; location
+                            <input type="text" class="ev-date" placeholder="e.g. August 29th • Western Gateway Park in Des Moines">
+                        </label>
+                        <label>Description
+                            <textarea class="ev-desc" placeholder="A sentence or two about the event"></textarea>
+                        </label>
+                    </div>
+                    <div class="event-row-actions">
+                        <button type="button" class="move-btn move-up">↑ Move up</button>
+                        <button type="button" class="move-btn move-down">↓ Move down</button>
+                        <button type="button" class="remove-btn">Remove</button>
+                    </div>
+                `;
+
+                row.querySelector('.ev-title').value = ev.title || '';
+                row.querySelector('.ev-date').value = ev.date || '';
+                row.querySelector('.ev-desc').value = ev.description || '';
+
+                row.querySelector('.ev-title').addEventListener('input', (e) => {
+                    upcomingEvents[index].title = e.target.value;
+                });
+                row.querySelector('.ev-date').addEventListener('input', (e) => {
+                    upcomingEvents[index].date = e.target.value;
+                });
+                row.querySelector('.ev-desc').addEventListener('input', (e) => {
+                    upcomingEvents[index].description = e.target.value;
+                });
+                row.querySelector('.move-up').addEventListener('click', () => {
+                    if (index === 0) return;
+                    [upcomingEvents[index - 1], upcomingEvents[index]] = [upcomingEvents[index], upcomingEvents[index - 1]];
+                    renderUpcomingList();
+                });
+                row.querySelector('.move-down').addEventListener('click', () => {
+                    if (index === upcomingEvents.length - 1) return;
+                    [upcomingEvents[index + 1], upcomingEvents[index]] = [upcomingEvents[index], upcomingEvents[index + 1]];
+                    renderUpcomingList();
+                });
+                row.querySelector('.remove-btn').addEventListener('click', () => {
+                    upcomingEvents.splice(index, 1);
+                    renderUpcomingList();
+                });
+
+                listEl.appendChild(row);
+            });
+        }
+
+        document.getElementById('add-upcoming-btn').addEventListener('click', () => {
+            upcomingEvents.push({ title: '', date: '', description: '' });
+            renderUpcomingList();
+        });
+
+        document.getElementById('save-upcoming-btn').addEventListener('click', async () => {
+            const msg = document.getElementById('upcoming-save-msg');
+            msg.textContent = 'Saving…';
+            msg.className = 'msg';
+            try {
+                await db.collection('site').doc('events').set({ upcoming: upcomingEvents }, { merge: true });
+                msg.textContent = 'Saved! The website will show these changes the next time it loads.';
+                msg.className = 'msg ok';
+            } catch (err) {
+                console.error(err);
+                msg.textContent = 'Save failed: ' + err.message;
+                msg.className = 'msg error';
+            }
+        });
+
+        // ---------------- Past Events ----------------
+
+        function renderPastList() {
+            const listEl = document.getElementById('past-events-list');
+            listEl.innerHTML = '';
+
+            if (pastEvents.length === 0) {
+                listEl.innerHTML = '<p class="empty-note">No past events yet. Click "+ Add Event" to add one.</p>';
+                return;
+            }
+
+            pastEvents.forEach((ev, index) => {
+                const row = document.createElement('div');
+                row.className = 'event-row';
+                row.innerHTML = `
+                    <div class="event-photo">
+                        <img class="event-thumb" src="" alt="">
+                        <input type="file" accept="image/*" class="ev-photo-input">
+                    </div>
+                    <div class="event-fields">
+                        <label>Title
+                            <input type="text" class="ev-title" placeholder="e.g. World Refugee Day">
+                        </label>
+                        <label>Date
+                            <input type="text" class="ev-date" placeholder="e.g. June 20th 2026">
+                        </label>
+                        <label>Description
+                            <textarea class="ev-desc" placeholder="A sentence or two about the event"></textarea>
+                        </label>
+                    </div>
+                    <div class="event-row-actions">
+                        <button type="button" class="move-btn move-up">↑ Move up</button>
+                        <button type="button" class="move-btn move-down">↓ Move down</button>
+                        <button type="button" class="remove-btn">Remove</button>
+                    </div>
+                `;
+
+                const thumbEl = row.querySelector('.event-thumb');
+                if (ev.photoUrl) thumbEl.src = ev.photoUrl;
+
+                row.querySelector('.ev-title').value = ev.title || '';
+                row.querySelector('.ev-date').value = ev.date || '';
+                row.querySelector('.ev-desc').value = ev.description || '';
+
+                row.querySelector('.ev-title').addEventListener('input', (e) => {
+                    pastEvents[index].title = e.target.value;
+                });
+                row.querySelector('.ev-date').addEventListener('input', (e) => {
+                    pastEvents[index].date = e.target.value;
+                });
+                row.querySelector('.ev-desc').addEventListener('input', (e) => {
+                    pastEvents[index].description = e.target.value;
+                });
+                row.querySelector('.move-up').addEventListener('click', () => {
+                    if (index === 0) return;
+                    [pastEvents[index - 1], pastEvents[index]] = [pastEvents[index], pastEvents[index - 1]];
+                    renderPastList();
+                });
+                row.querySelector('.move-down').addEventListener('click', () => {
+                    if (index === pastEvents.length - 1) return;
+                    [pastEvents[index + 1], pastEvents[index]] = [pastEvents[index], pastEvents[index + 1]];
+                    renderPastList();
+                });
+                row.querySelector('.remove-btn').addEventListener('click', () => {
+                    pastEvents.splice(index, 1);
+                    renderPastList();
+                });
+
+                row.querySelector('.ev-photo-input').addEventListener('change', async (e) => {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) return;
+                    const msg = document.getElementById('past-save-msg');
+                    msg.textContent = 'Uploading photo…';
+                    msg.className = 'msg';
+                    try {
+                        const url = await uploadToCloudinary(file, false);
+                        pastEvents[index].photoUrl = url;
+                        thumbEl.src = url;
+                        // Photos save immediately so a photo pick can't be lost
+                        // if the admin forgets to press "Save Past Events".
+                        await db.collection('site').doc('events').set({ past: pastEvents }, { merge: true });
+                        msg.textContent = 'Photo uploaded and saved!';
+                        msg.className = 'msg ok';
+                    } catch (err) {
+                        console.error(err);
+                        msg.textContent = 'Photo upload failed — check the setup in firebase-config.js.';
+                        msg.className = 'msg error';
+                    }
+                });
+
+                listEl.appendChild(row);
+            });
+        }
+
+        document.getElementById('add-past-btn').addEventListener('click', () => {
+            pastEvents.push({ title: '', date: '', description: '', photoUrl: '' });
+            renderPastList();
+        });
+
+        document.getElementById('save-past-btn').addEventListener('click', async () => {
+            const msg = document.getElementById('past-save-msg');
+            msg.textContent = 'Saving…';
+            msg.className = 'msg';
+            try {
+                await db.collection('site').doc('events').set({ past: pastEvents }, { merge: true });
+                msg.textContent = 'Saved! The website will show these changes the next time it loads.';
+                msg.className = 'msg ok';
+            } catch (err) {
+                console.error(err);
+                msg.textContent = 'Save failed: ' + err.message;
+                msg.className = 'msg error';
+            }
+        });
 
         function renderSlots() {
             SLOTS.forEach((slot) => {
