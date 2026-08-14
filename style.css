@@ -521,12 +521,31 @@ a {
     font-size: 0.95rem;
 }
 
+.performance-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.performance-text {
+    flex: 1 1 0;
+    min-width: 200px;
+}
+
+.performance-text h2 {
+    margin-bottom: 0.4rem;
+}
+
 .performance-media {
-    margin-top: 1.75rem;
-    max-width: 640px;
+    flex: 0 0 640px;
+    max-width: 100%;
 }
 
 .performance-media .admin-upload {
+    width: 640px;
+    max-width: 100%;
     aspect-ratio: 16 / 9;
 }
 
