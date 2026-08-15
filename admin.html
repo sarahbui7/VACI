@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VACI Lions — Photo Admin</title>
+    <title>VACI Lions Photo Admin</title>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -289,7 +289,7 @@
             <div class="admin-panel active" data-adminpanel="home">
                 <div class="group">
                     <h2>Featured Photo Slideshow</h2>
-                    <p class="group-hint">Up to 5 photos, all 4:3. On the site these fade from one to the next in the box next to the intro text. You don't need to fill all 5 — it'll just cycle through whichever ones are set.</p>
+                    <p class="group-hint">Up to 5 photos, all 4:3. It'll just cycle through whichever ones are set for home page.</p>
                     <div id="slots-hero"></div>
                 </div>
                 <div class="group">
@@ -340,7 +340,7 @@
             <div class="admin-panel" data-adminpanel="gallery">
                 <div class="group">
                     <h2>Photo Gallery</h2>
-                    <p class="group-hint">Add as many photos as you like. Visitors click a photo to see it full-size with the description you write. Pick a ratio for each photo — 4:3, 1:1 (square), or 3:4 — they'll all display at the same height on the gallery page.</p>
+                    <p class="group-hint">Pick a ratio for each photo: 4x3, 1x1 , or 3x4 they'll all display at the same height on the gallery page.</p>
                     <div id="gallery-list"></div>
                     <div class="event-actions-row">
                         <button id="add-gallery-btn" type="button" class="secondary-btn">+ Add Photo</button>
@@ -705,7 +705,7 @@
                         msg.className = 'msg ok';
                     } catch (err) {
                         console.error(err);
-                        msg.textContent = 'Photo upload failed — check the setup in firebase-config.js.';
+                        msg.textContent = 'Photo upload failed. Check the setup in firebase-config.js.';
                         msg.className = 'msg error';
                     }
                 });
@@ -817,7 +817,7 @@
                         msg.className = 'msg ok';
                     } catch (err) {
                         console.error(err);
-                        msg.textContent = 'Photo upload failed — check the setup in firebase-config.js.';
+                        msg.textContent = 'Photo upload failed. Check the setup in firebase-config.js.';
                         msg.className = 'msg error';
                     }
                 });
@@ -905,7 +905,7 @@
                 statusMsg.className = 'msg ok';
             } catch (err) {
                 console.error(err);
-                statusMsg.textContent = 'Upload failed — check the setup in firebase-config.js.';
+                statusMsg.textContent = 'Upload failed. Check the setup in firebase-config.js.';
                 statusMsg.className = 'msg error';
                 document.getElementById(`status-${key}`).textContent = 'Upload failed';
             }
