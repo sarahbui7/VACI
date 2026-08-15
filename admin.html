@@ -19,7 +19,7 @@
             padding: 2rem 1rem 4rem;
         }
         .wrap {
-            width: min(760px, 100%);
+            width: min(820px, 100%);
             margin: 0 auto;
         }
         h1 {
@@ -58,6 +58,31 @@
         }
         button:hover { opacity: 0.9; }
         #app { display: none; }
+
+        /* ---- Admin tab bar (mirrors the site's own tabs, plus Gallery) ---- */
+        .admin-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.75rem;
+        }
+        .admin-tab {
+            border: 2px solid rgba(18,19,69,0.15);
+            background: transparent;
+            color: #451212;
+            font-size: 0.88rem;
+            padding: 0.6rem 1.05rem;
+            border-radius: 999px;
+        }
+        .admin-tab:hover { opacity: 1; background: rgba(18,19,69,0.05); }
+        .admin-tab.active {
+            background: #8f3b3b;
+            border-color: #8f3b3b;
+            color: #fff;
+        }
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; }
+
         .group {
             margin-bottom: 2.25rem;
         }
@@ -153,6 +178,7 @@
             color: #451212;
         }
         .event-fields input[type="text"],
+        .event-fields select,
         .event-fields textarea {
             font: inherit;
             font-weight: 400;
@@ -165,6 +191,11 @@
             resize: vertical;
             min-height: 3.5rem;
         }
+        .field-row {
+            display: flex;
+            gap: 0.6rem;
+        }
+        .field-row label { flex: 1; }
         .event-row-actions {
             flex-shrink: 0;
             display: flex;
@@ -205,12 +236,33 @@
             font-style: italic;
             padding: 0.5rem 0;
         }
+
+        /* ---- Year sub-tabs, used inside the Past Events admin tab ---- */
+        .year-subtabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        .year-subtab {
+            border: 1.5px solid rgba(18,19,69,0.15);
+            background: transparent;
+            color: #451212;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.85rem;
+            border-radius: 999px;
+        }
+        .year-subtab.active {
+            background: #451212;
+            border-color: #451212;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
     <div class="wrap">
         <h1>VACI Lions Photo Admin</h1>
-        <p class="sub">Upload photos for the website</p>
+        <p class="sub">Manage everything shown on the website, tab by tab</p>
 
         <div id="login-card" class="card">
             <input type="email" id="email-input" placeholder="Email" autocomplete="username">
@@ -224,39 +276,86 @@
                 ⚠️ Cloudinary and/or Firebase haven't been configured yet in <code>firebase-config.js</code>. Uploads won't work until that's filled in.
             </div>
 
-            <div class="group">
-                <h2>Home Page</h2>
-                <div id="slots-home"></div>
-            </div>
-            <div class="group">
-                <h2>What We Do</h2>
-                <div id="slots-whatwedo"></div>
-            </div>
-            <div class="group">
-                <h2>Leaders &amp; Members</h2>
-                <div id="slots-roster"></div>
+            <div class="admin-tabs">
+                <button type="button" class="admin-tab active" data-admintab="home">Home</button>
+                <button type="button" class="admin-tab" data-admintab="whatwedo">What We Do</button>
+                <button type="button" class="admin-tab" data-admintab="upcoming">Upcoming Events</button>
+                <button type="button" class="admin-tab" data-admintab="past">Past Events</button>
+                <button type="button" class="admin-tab" data-admintab="gallery">Photo Gallery</button>
+                <button type="button" class="admin-tab" data-admintab="roster">Leaders &amp; Members</button>
             </div>
 
-            <div class="group">
-                <h2>Upcoming Events</h2>
-                <p class="group-hint">These show up on the "Upcoming Events" page, in order.</p>
-                <div id="upcoming-events-list"></div>
-                <div class="event-actions-row">
-                    <button id="add-upcoming-btn" type="button" class="secondary-btn">+ Add Event</button>
-                    <button id="save-upcoming-btn" type="button">Save Upcoming Events</button>
+            <!-- ============ HOME ============ -->
+            <div class="admin-panel active" data-adminpanel="home">
+                <div class="group">
+                    <h2>Featured Photo Slideshow</h2>
+                    <p class="group-hint">Up to 5 photos, all 4:3. On the site these fade from one to the next in the box next to the intro text. You don't need to fill all 5 — it'll just cycle through whichever ones are set.</p>
+                    <div id="slots-hero"></div>
                 </div>
-                <p id="upcoming-save-msg" class="msg"></p>
+                <div class="group">
+                    <h2>Recent Photos strip</h2>
+                    <p class="group-hint">The 4 scrolling photos on the home page, all 4:3.</p>
+                    <div id="slots-home"></div>
+                </div>
             </div>
 
-            <div class="group">
-                <h2>Past Events</h2>
-                <p class="group-hint">These show up on the "Past Events" page, each with its own photo.</p>
-                <div id="past-events-list"></div>
-                <div class="event-actions-row">
-                    <button id="add-past-btn" type="button" class="secondary-btn">+ Add Event</button>
-                    <button id="save-past-btn" type="button">Save Past Events</button>
+            <!-- ============ WHAT WE DO ============ -->
+            <div class="admin-panel" data-adminpanel="whatwedo">
+                <div class="group">
+                    <h2>What We Do</h2>
+                    <div id="slots-whatwedo"></div>
                 </div>
-                <p id="past-save-msg" class="msg"></p>
+            </div>
+
+            <!-- ============ UPCOMING EVENTS ============ -->
+            <div class="admin-panel" data-adminpanel="upcoming">
+                <div class="group">
+                    <h2>Upcoming Events</h2>
+                    <p class="group-hint">These show up on the "Upcoming Events" page, in order.</p>
+                    <div id="upcoming-events-list"></div>
+                    <div class="event-actions-row">
+                        <button id="add-upcoming-btn" type="button" class="secondary-btn">+ Add Event</button>
+                        <button id="save-upcoming-btn" type="button">Save Upcoming Events</button>
+                    </div>
+                    <p id="upcoming-save-msg" class="msg"></p>
+                </div>
+            </div>
+
+            <!-- ============ PAST EVENTS ============ -->
+            <div class="admin-panel" data-adminpanel="past">
+                <div class="group">
+                    <h2>Past Events</h2>
+                    <p class="group-hint">These show up on the "Past Events" page grouped into a tab per year. Give each event a year below so it lands in the right tab — if you leave it blank, the site will try to guess the year from the date field.</p>
+                    <div class="year-subtabs" id="past-year-subtabs"></div>
+                    <div id="past-events-list"></div>
+                    <div class="event-actions-row">
+                        <button id="add-past-btn" type="button" class="secondary-btn">+ Add Event</button>
+                        <button id="save-past-btn" type="button">Save Past Events</button>
+                    </div>
+                    <p id="past-save-msg" class="msg"></p>
+                </div>
+            </div>
+
+            <!-- ============ PHOTO GALLERY ============ -->
+            <div class="admin-panel" data-adminpanel="gallery">
+                <div class="group">
+                    <h2>Photo Gallery</h2>
+                    <p class="group-hint">Add as many photos as you like. Visitors click a photo to see it full-size with the description you write. Pick a ratio for each photo — 4:3, 1:1 (square), or 3:4 — they'll all display at the same height on the gallery page.</p>
+                    <div id="gallery-list"></div>
+                    <div class="event-actions-row">
+                        <button id="add-gallery-btn" type="button" class="secondary-btn">+ Add Photo</button>
+                        <button id="save-gallery-btn" type="button">Save Photo Gallery</button>
+                    </div>
+                    <p id="gallery-save-msg" class="msg"></p>
+                </div>
+            </div>
+
+            <!-- ============ LEADERS & MEMBERS ============ -->
+            <div class="admin-panel" data-adminpanel="roster">
+                <div class="group">
+                    <h2>Leaders &amp; Members</h2>
+                    <div id="slots-roster"></div>
+                </div>
             </div>
 
             <p id="status-msg" class="msg"></p>
@@ -268,7 +367,11 @@
 
     <script>
         const SLOTS = [
-            { key: 'hero-photo',    label: 'Circle 1x1: Featured photo',       group: 'slots-home' },
+            { key: 'hero-photo-1', label: '4x3: Featured photo 1', group: 'slots-hero' },
+            { key: 'hero-photo-2', label: '4x3: Featured photo 2', group: 'slots-hero' },
+            { key: 'hero-photo-3', label: '4x3: Featured photo 3', group: 'slots-hero' },
+            { key: 'hero-photo-4', label: '4x3: Featured photo 4', group: 'slots-hero' },
+            { key: 'hero-photo-5', label: '4x3: Featured photo 5', group: 'slots-hero' },
             { key: 'gallery-1',     label: '4x3: Recent photo 1',              group: 'slots-home' },
             { key: 'gallery-2',     label: '4x3: Recent photo 2',              group: 'slots-home' },
             { key: 'gallery-3',     label: '4x3: Recent photo 3',              group: 'slots-home' },
@@ -290,6 +393,8 @@
         let slotsRendered = false;
         let upcomingEvents = [];
         let pastEvents = [];
+        let galleryPhotos = [];
+        let pastYearFilter = 'All';
 
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
@@ -321,6 +426,16 @@
             }
         });
 
+        // ---------------- Admin tab switching ----------------
+        document.querySelectorAll('.admin-tab').forEach((tab) => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.admin-tab').forEach((t) => t.classList.remove('active'));
+                document.querySelectorAll('.admin-panel').forEach((p) => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelector(`.admin-panel[data-adminpanel="${tab.dataset.admintab}"]`).classList.add('active');
+            });
+        });
+
         function initAdmin() {
             const notConfigured =
                 cloudinaryConfig.cloudName.startsWith('PASTE_') ||
@@ -344,6 +459,12 @@
                 renderUpcomingList();
                 renderPastList();
             }).catch((err) => console.warn('Could not load events:', err));
+
+            db.collection('site').doc('gallery').get().then((doc) => {
+                const data = doc.exists ? (doc.data() || {}) : {};
+                galleryPhotos = Array.isArray(data.photos) ? data.photos : [];
+                renderGalleryList();
+            }).catch((err) => console.warn('Could not load gallery:', err));
         }
 
         // ---------------- Upcoming Events ----------------
@@ -431,18 +552,62 @@
             }
         });
 
-        // ---------------- Past Events ----------------
+        // ---------------- Past Events (with year sub-tabs) ----------------
+
+        function pastEventYear(ev) {
+            if (ev.year) return String(ev.year).trim();
+            const match = (ev.date || '').match(/\b(19|20)\d{2}\b/);
+            return match ? match[0] : 'Other';
+        }
+
+        function renderPastYearSubtabs() {
+            const wrap = document.getElementById('past-year-subtabs');
+            wrap.innerHTML = '';
+
+            const years = Array.from(new Set(pastEvents.map(pastEventYear))).sort((a, b) => {
+                if (a === 'Other') return 1;
+                if (b === 'Other') return -1;
+                return Number(b) - Number(a);
+            });
+
+            if (!years.includes(pastYearFilter) && pastYearFilter !== 'All') {
+                pastYearFilter = 'All';
+            }
+
+            const allBtn = document.createElement('button');
+            allBtn.type = 'button';
+            allBtn.className = 'year-subtab' + (pastYearFilter === 'All' ? ' active' : '');
+            allBtn.textContent = 'All';
+            allBtn.addEventListener('click', () => { pastYearFilter = 'All'; renderPastList(); });
+            wrap.appendChild(allBtn);
+
+            years.forEach((year) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'year-subtab' + (pastYearFilter === year ? ' active' : '');
+                btn.textContent = year;
+                btn.addEventListener('click', () => { pastYearFilter = year; renderPastList(); });
+                wrap.appendChild(btn);
+            });
+        }
 
         function renderPastList() {
+            renderPastYearSubtabs();
+
             const listEl = document.getElementById('past-events-list');
             listEl.innerHTML = '';
 
-            if (pastEvents.length === 0) {
-                listEl.innerHTML = '<p class="empty-note">No past events yet. Click "+ Add Event" to add one.</p>';
+            const indices = pastEvents
+                .map((ev, i) => i)
+                .filter((i) => pastYearFilter === 'All' || pastEventYear(pastEvents[i]) === pastYearFilter);
+
+            if (indices.length === 0) {
+                listEl.innerHTML = '<p class="empty-note">No past events here yet. Click "+ Add Event" to add one.</p>';
                 return;
             }
 
-            pastEvents.forEach((ev, index) => {
+            indices.forEach((index, pos) => {
+                const ev = pastEvents[index];
                 const row = document.createElement('div');
                 row.className = 'event-row';
                 row.innerHTML = `
@@ -451,9 +616,14 @@
                         <input type="file" accept="image/*" class="ev-photo-input">
                     </div>
                     <div class="event-fields">
-                        <label>Title
-                            <input type="text" class="ev-title" placeholder="e.g. World Refugee Day">
-                        </label>
+                        <div class="field-row">
+                            <label>Title
+                                <input type="text" class="ev-title" placeholder="e.g. World Refugee Day">
+                            </label>
+                            <label>Year
+                                <input type="text" class="ev-year" placeholder="e.g. 2026">
+                            </label>
+                        </div>
                         <label>Date
                             <input type="text" class="ev-date" placeholder="e.g. June 20th 2026">
                         </label>
@@ -472,11 +642,15 @@
                 if (ev.photoUrl) thumbEl.src = ev.photoUrl;
 
                 row.querySelector('.ev-title').value = ev.title || '';
+                row.querySelector('.ev-year').value = ev.year || '';
                 row.querySelector('.ev-date').value = ev.date || '';
                 row.querySelector('.ev-desc').value = ev.description || '';
 
                 row.querySelector('.ev-title').addEventListener('input', (e) => {
                     pastEvents[index].title = e.target.value;
+                });
+                row.querySelector('.ev-year').addEventListener('input', (e) => {
+                    pastEvents[index].year = e.target.value;
                 });
                 row.querySelector('.ev-date').addEventListener('input', (e) => {
                     pastEvents[index].date = e.target.value;
@@ -484,14 +658,21 @@
                 row.querySelector('.ev-desc').addEventListener('input', (e) => {
                     pastEvents[index].description = e.target.value;
                 });
+                row.querySelector('.ev-year').addEventListener('change', () => {
+                    // Year changed — refresh the sub-tabs and stay on "All"
+                    // so the moved event doesn't disappear from view.
+                    renderPastYearSubtabs();
+                });
                 row.querySelector('.move-up').addEventListener('click', () => {
-                    if (index === 0) return;
-                    [pastEvents[index - 1], pastEvents[index]] = [pastEvents[index], pastEvents[index - 1]];
+                    if (pos === 0) return;
+                    const prevIndex = indices[pos - 1];
+                    [pastEvents[prevIndex], pastEvents[index]] = [pastEvents[index], pastEvents[prevIndex]];
                     renderPastList();
                 });
                 row.querySelector('.move-down').addEventListener('click', () => {
-                    if (index === pastEvents.length - 1) return;
-                    [pastEvents[index + 1], pastEvents[index]] = [pastEvents[index], pastEvents[index + 1]];
+                    if (pos === indices.length - 1) return;
+                    const nextIndex = indices[pos + 1];
+                    [pastEvents[nextIndex], pastEvents[index]] = [pastEvents[index], pastEvents[nextIndex]];
                     renderPastList();
                 });
                 row.querySelector('.remove-btn').addEventListener('click', () => {
@@ -526,7 +707,8 @@
         }
 
         document.getElementById('add-past-btn').addEventListener('click', () => {
-            pastEvents.push({ title: '', date: '', description: '', photoUrl: '' });
+            const newYear = pastYearFilter !== 'All' ? pastYearFilter : '';
+            pastEvents.push({ title: '', date: '', description: '', photoUrl: '', year: newYear });
             renderPastList();
         });
 
@@ -544,6 +726,119 @@
                 msg.className = 'msg error';
             }
         });
+
+        // ---------------- Photo Gallery ----------------
+
+        function renderGalleryList() {
+            const listEl = document.getElementById('gallery-list');
+            listEl.innerHTML = '';
+
+            if (galleryPhotos.length === 0) {
+                listEl.innerHTML = '<p class="empty-note">No gallery photos yet. Click "+ Add Photo" to add one.</p>';
+                return;
+            }
+
+            galleryPhotos.forEach((photo, index) => {
+                const row = document.createElement('div');
+                row.className = 'event-row';
+                row.innerHTML = `
+                    <div class="event-photo">
+                        <img class="event-thumb" src="" alt="">
+                        <input type="file" accept="image/*" class="gal-photo-input">
+                    </div>
+                    <div class="event-fields">
+                        <label>Ratio
+                            <select class="gal-ratio">
+                                <option value="4:3">4:3</option>
+                                <option value="1:1">1:1 (square)</option>
+                                <option value="3:4">3:4</option>
+                            </select>
+                        </label>
+                        <label>Description
+                            <textarea class="gal-desc" placeholder="A sentence or two shown when someone clicks the photo"></textarea>
+                        </label>
+                    </div>
+                    <div class="event-row-actions">
+                        <button type="button" class="move-btn move-up">↑ Move up</button>
+                        <button type="button" class="move-btn move-down">↓ Move down</button>
+                        <button type="button" class="remove-btn">Remove</button>
+                    </div>
+                `;
+
+                const thumbEl = row.querySelector('.event-thumb');
+                if (photo.url) thumbEl.src = photo.url;
+
+                row.querySelector('.gal-ratio').value = photo.ratio || '4:3';
+                row.querySelector('.gal-desc').value = photo.description || '';
+
+                row.querySelector('.gal-ratio').addEventListener('change', (e) => {
+                    galleryPhotos[index].ratio = e.target.value;
+                });
+                row.querySelector('.gal-desc').addEventListener('input', (e) => {
+                    galleryPhotos[index].description = e.target.value;
+                });
+                row.querySelector('.move-up').addEventListener('click', () => {
+                    if (index === 0) return;
+                    [galleryPhotos[index - 1], galleryPhotos[index]] = [galleryPhotos[index], galleryPhotos[index - 1]];
+                    renderGalleryList();
+                });
+                row.querySelector('.move-down').addEventListener('click', () => {
+                    if (index === galleryPhotos.length - 1) return;
+                    [galleryPhotos[index + 1], galleryPhotos[index]] = [galleryPhotos[index], galleryPhotos[index + 1]];
+                    renderGalleryList();
+                });
+                row.querySelector('.remove-btn').addEventListener('click', () => {
+                    galleryPhotos.splice(index, 1);
+                    renderGalleryList();
+                });
+
+                row.querySelector('.gal-photo-input').addEventListener('change', async (e) => {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) return;
+                    const msg = document.getElementById('gallery-save-msg');
+                    msg.textContent = 'Uploading photo…';
+                    msg.className = 'msg';
+                    try {
+                        const url = await uploadToCloudinary(file, false);
+                        galleryPhotos[index].url = url;
+                        thumbEl.src = url;
+                        // Photos save immediately so a photo pick can't be lost
+                        // if the admin forgets to press "Save Photo Gallery".
+                        await db.collection('site').doc('gallery').set({ photos: galleryPhotos }, { merge: true });
+                        msg.textContent = 'Photo uploaded and saved!';
+                        msg.className = 'msg ok';
+                    } catch (err) {
+                        console.error(err);
+                        msg.textContent = 'Photo upload failed — check the setup in firebase-config.js.';
+                        msg.className = 'msg error';
+                    }
+                });
+
+                listEl.appendChild(row);
+            });
+        }
+
+        document.getElementById('add-gallery-btn').addEventListener('click', () => {
+            galleryPhotos.push({ url: '', description: '', ratio: '4:3' });
+            renderGalleryList();
+        });
+
+        document.getElementById('save-gallery-btn').addEventListener('click', async () => {
+            const msg = document.getElementById('gallery-save-msg');
+            msg.textContent = 'Saving…';
+            msg.className = 'msg';
+            try {
+                await db.collection('site').doc('gallery').set({ photos: galleryPhotos }, { merge: true });
+                msg.textContent = 'Saved! The website will show these changes the next time it loads.';
+                msg.className = 'msg ok';
+            } catch (err) {
+                console.error(err);
+                msg.textContent = 'Save failed: ' + err.message;
+                msg.className = 'msg error';
+            }
+        });
+
+        // ---------------- Fixed image/video slots ----------------
 
         function renderSlots() {
             SLOTS.forEach((slot) => {
