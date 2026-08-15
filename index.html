@@ -361,6 +361,13 @@
                 panel.classList.toggle('active', panel.dataset.panel === tabName);
             });
 
+            if (tabName === 'gallery' && typeof layoutGallery === 'function') {
+                // The panel is display:none until this class flips, so
+                // the container had zero width for any earlier layout
+                // pass. Measure again now that it's actually visible.
+                requestAnimationFrame(layoutGallery);
+            }
+
             if (anchorId) {
                 const target = document.getElementById(anchorId);
                 if (target) {
@@ -572,6 +579,106 @@
             if (e.key === 'Escape') closeLightbox();
         });
 
+        // Turn a "4:3" style ratio string into a width/height number.
+        // Falls back to 4:3 if the string is missing or malformed.
+        function ratioToAspect(ratio) {
+            const parts = String(ratio || '4:3').split(':').map(Number);
+            if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
+                return parts[0] / parts[1];
+            }
+            return 4 / 3;
+        }
+
+        // ---- Justified photo grid ----
+        // Lays out each row of .gallery-item elements so every photo in
+        // that row shares the same height and the row's photos, plus
+        // gaps, exactly fill the container's width — the classic
+        // "justified gallery" look. Different rows end up with
+        // different heights depending on how many photos land in them
+        // and how wide/tall those photos are.
+        function layoutGallery() {
+            const container = document.getElementById('photo-gallery');
+            if (!container) return;
+
+            const items = Array.from(container.querySelectorAll('.gallery-item'));
+            if (items.length === 0) return;
+
+            const containerWidth = container.clientWidth;
+            if (containerWidth <= 0) return;
+
+            const containerStyles = getComputedStyle(container);
+            const gap = parseFloat(containerStyles.columnGap || containerStyles.gap) || 16;
+            const targetHeight = parseFloat(containerStyles.getPropertyValue('--gallery-row-height')) || 220;
+            const maxHeight = targetHeight * 1.6; // cap so a sparse last row doesn't blow up
+
+            let row = [];
+            let rowAspectSum = 0;
+
+            function flushRow(isLeftover) {
+                if (row.length === 0) return;
+
+                const totalGap = gap * (row.length - 1);
+                let rowHeight = (containerWidth - totalGap) / rowAspectSum;
+
+                // The final, incomplete row: stretching it to fill the
+                // width would make it awkwardly tall, so just use the
+                // target height and let it sit short of the edge.
+                if (isLeftover && rowHeight > maxHeight) {
+                    rowHeight = targetHeight;
+                }
+
+                let widths = row.map((item) => rowHeight * (parseFloat(item.dataset.aspect) || 4 / 3));
+
+                if (!isLeftover || rowHeight !== targetHeight) {
+                    // Round to whole pixels, then push any rounding
+                    // remainder onto the last item so the row's total
+                    // width lines up exactly with the container —
+                    // otherwise sub-pixel drift can wrap an item early.
+                    const rounded = widths.map((w) => Math.round(w));
+                    const target = Math.round(containerWidth - totalGap);
+                    const drift = target - rounded.reduce((a, b) => a + b, 0);
+                    rounded[rounded.length - 1] += drift;
+                    widths = rounded;
+                }
+
+                row.forEach((item, i) => {
+                    item.style.height = rowHeight + 'px';
+                    item.style.width = Math.max(widths[i], 40) + 'px';
+                });
+
+                row = [];
+                rowAspectSum = 0;
+            }
+
+            items.forEach((item) => {
+                const aspect = parseFloat(item.dataset.aspect) || 4 / 3;
+                row.push(item);
+                rowAspectSum += aspect;
+
+                const widthAtTarget = rowAspectSum * targetHeight + gap * (row.length - 1);
+                if (widthAtTarget >= containerWidth) {
+                    flushRow(false);
+                }
+            });
+
+            flushRow(true);
+        }
+
+        // Re-run the layout whenever the gallery's own box size changes —
+        // window resizes, and also the tab-panel going from display:none
+        // to display:block when the user switches to the Gallery tab.
+        const galleryContainerEl = document.getElementById('photo-gallery');
+        if (galleryContainerEl && window.ResizeObserver) {
+            let galleryLayoutFrame = null;
+            const galleryResizeObserver = new ResizeObserver(() => {
+                if (galleryLayoutFrame) cancelAnimationFrame(galleryLayoutFrame);
+                galleryLayoutFrame = requestAnimationFrame(layoutGallery);
+            });
+            galleryResizeObserver.observe(galleryContainerEl);
+        } else {
+            window.addEventListener('resize', () => requestAnimationFrame(layoutGallery));
+        }
+
         function renderGallery(photos) {
             const container = document.getElementById('photo-gallery');
             container.innerHTML = '';
@@ -589,10 +696,23 @@
                 btn.type = 'button';
                 btn.className = 'gallery-item';
                 btn.dataset.ratio = photo.ratio || '4:3';
+                btn.dataset.aspect = String(ratioToAspect(photo.ratio));
 
                 const img = document.createElement('img');
-                img.src = photo.url;
                 img.alt = photo.description ? photo.description : 'Gallery photo';
+
+                // Once the real photo loads, prefer its actual aspect
+                // ratio over the admin-picked 4:3 / 1:1 / 3:4 label —
+                // it's more accurate, so the row this photo ends up in
+                // fits it more tightly. Re-layout afterward.
+                img.addEventListener('load', () => {
+                    if (img.naturalWidth && img.naturalHeight) {
+                        btn.dataset.aspect = String(img.naturalWidth / img.naturalHeight);
+                        layoutGallery();
+                    }
+                });
+
+                img.src = photo.url;
                 btn.appendChild(img);
 
                 btn.addEventListener('click', () => {
@@ -601,6 +721,8 @@
 
                 container.appendChild(btn);
             });
+
+            layoutGallery();
         }
 
         // ---- Home hero: crossfade slideshow across up to 5 photos ----

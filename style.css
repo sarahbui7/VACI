@@ -404,6 +404,11 @@ a {
 /* ---------- Photo Gallery page ---------- */
 
 .photo-gallery {
+    /* This is the target row height the justified-layout script aims
+       for. It's read from JS via getComputedStyle, and overridden at
+       the mobile breakpoint below — so the two stay in sync from one
+       place instead of duplicating a pixel value in the script. */
+    --gallery-row-height: 220px;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
@@ -411,7 +416,10 @@ a {
 }
 
 .gallery-item {
-    height: 220px;
+    /* Fallback size before JS measures the container and lays out
+       real justified rows (also the size used if JS ever fails). */
+    height: var(--gallery-row-height);
+    width: calc(var(--gallery-row-height) * 4 / 3);
     border: 0;
     padding: 0;
     background: repeating-linear-gradient(135deg, rgba(59,64,143,0.03) 0 10px, rgba(59,64,143,0.06) 10px 20px);
@@ -427,10 +435,6 @@ a {
     transform: translateY(-3px);
     box-shadow: 0 10px 22px rgba(18, 19, 69, 0.2);
 }
-
-.gallery-item[data-ratio="4:3"] { width: calc(220px * 4 / 3); }
-.gallery-item[data-ratio="1:1"] { width: 220px; }
-.gallery-item[data-ratio="3:4"] { width: calc(220px * 3 / 4); }
 
 .gallery-item img {
     width: 100%;
@@ -981,11 +985,7 @@ a {
         width: 9rem;
     }
 
-    .gallery-item {
-        height: 150px;
+    .photo-gallery {
+        --gallery-row-height: 150px;
     }
-
-    .gallery-item[data-ratio="4:3"] { width: calc(150px * 4 / 3); }
-    .gallery-item[data-ratio="1:1"] { width: 150px; }
-    .gallery-item[data-ratio="3:4"] { width: calc(150px * 3 / 4); }
 }
