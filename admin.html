@@ -325,7 +325,7 @@
             <div class="admin-panel" data-adminpanel="past">
                 <div class="group">
                     <h2>Past Events</h2>
-                    <p class="group-hint">These show up on the "Past Events" page grouped into a tab per year. Give each event a year below so it lands in the right tab — if you leave it blank, the site will try to guess the year from the date field.</p>
+                    <p class="group-hint">If you leave the year blank, the site will try to guess the year from the date field.</p>
                     <div class="year-subtabs" id="past-year-subtabs"></div>
                     <div id="past-events-list"></div>
                     <div class="event-actions-row">
@@ -353,8 +353,12 @@
             <!-- ============ LEADERS & MEMBERS ============ -->
             <div class="admin-panel" data-adminpanel="roster">
                 <div class="group">
-                    <h2>Leaders &amp; Members</h2>
+                    <h2>Team Leaders</h2>
                     <div id="slots-roster"></div>
+                </div>
+                <div class="group">
+                    <h2>Previous Team Leaders</h2>
+                    <div id="slots-roster-alumni"></div>
                 </div>
             </div>
 
@@ -381,6 +385,10 @@
             { key: 'leader-jordyn', label: 'Circle 1x1: Jordyn Cherniss',      group: 'slots-roster' },
             { key: 'leader-tosh',   label: 'Circle 1x1: Tosh Cherniss',        group: 'slots-roster' },
             { key: 'leader-sarah',  label: 'Circle 1x1: Sarah Bui',            group: 'slots-roster' },
+            { key: 'alumni-andrew', label: 'Circle 1x1: Andrew Trieu',         group: 'slots-roster-alumni' },
+            { key: 'alumni-ly',     label: 'Circle 1x1: Ly Nguyen',            group: 'slots-roster-alumni' },
+            { key: 'alumni-alex',   label: 'Circle 1x1: Alex Ngo',             group: 'slots-roster-alumni' },
+            { key: 'alumni-angela', label: 'Circle 1x1: Angela Ling',          group: 'slots-roster-alumni' },
         ];
 
         const loginCard = document.getElementById('login-card');
