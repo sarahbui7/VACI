@@ -911,6 +911,70 @@ a {
 
 /* ---------- Responsive ---------- */
 
+.email-trigger {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.email-trigger:hover {
+    text-decoration: underline;
+}
+
+.email-dialog {
+    margin: auto;
+    width: min(440px, calc(100% - 2rem));
+    max-height: calc(100% - 2rem);
+    overflow: auto;
+    padding: 1.75rem;
+    border: 1px solid var(--hairline);
+    border-radius: 1.25rem;
+    background: var(--bubble);
+    color: var(--text);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+}
+
+.email-dialog::backdrop {
+    background: rgba(20, 6, 5, 0.65);
+}
+
+.email-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.email-close {
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--bg);
+    color: #fff;
+    font: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.email-contact {
+    padding: 0.85rem 0;
+    overflow-wrap: anywhere;
+}
+
+.email-contact + .email-contact {
+    border-top: 1px solid var(--hairline);
+}
+
+.email-contact a {
+    text-underline-offset: 0.2em;
+}
+
 @media (max-width: 860px) {
     .join-panel {
         grid-template-columns: 1fr;

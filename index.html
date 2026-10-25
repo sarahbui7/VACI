@@ -315,8 +315,19 @@
     <footer class="site-footer">
         <a href="https://www.instagram.com/vaci_lions/" target="_blank" rel="noopener noreferrer">Instagram</a>
         <a href="https://www.vietnameseiniowa.org/" target="_blank" rel="noopener noreferrer">VACI</a>
-        <a href="mailto:vacilions@example.com">Contact</a>
+        <button type="button" class="email-trigger" id="email-trigger" aria-haspopup="dialog" aria-controls="email-dialog">Email</button>
     </footer>
+
+    <dialog class="email-dialog" id="email-dialog" aria-labelledby="email-title">
+        <div class="email-dialog-header">
+            <h2 id="email-title">Email Us</h2>
+            <form method="dialog">
+                <button type="submit" class="email-close" aria-label="Close email popup" autofocus>&times;</button>
+            </form>
+        </div>
+        <p class="email-contact"><strong>Andy:</strong> <a href="mailto:andyta4002@gmail.com">andyta4002@gmail.com</a></p>
+        <p class="email-contact"><strong>Sarah:</strong> <a href="mailto:buisarah07@gmail.com">buisarah07@gmail.com</a></p>
+    </dialog>
 
     <div class="lightbox-overlay" id="lightbox-overlay">
         <div class="lightbox-box">
@@ -329,6 +340,19 @@
     </div>
 
     <script>
+        const emailDialog = document.getElementById('email-dialog');
+        document.getElementById('email-trigger').addEventListener('click', () => {
+            emailDialog.showModal();
+        });
+        emailDialog.addEventListener('click', (event) => {
+            const bounds = emailDialog.getBoundingClientRect();
+            if (event.target === emailDialog &&
+                (event.clientX < bounds.left || event.clientX > bounds.right ||
+                 event.clientY < bounds.top || event.clientY > bounds.bottom)) {
+                emailDialog.close();
+            }
+        });
+
         // ---- Keep body padding in sync with the nav bar's actual height ----
         // The nav wraps onto extra lines at various widths (e.g. around
         // 880px and below), which changes its height. A hard-coded
