@@ -1136,11 +1136,12 @@ a {
         flex-direction: column;
         align-items: flex-start;
         text-align: left;
+        min-width: 0;
     }
 
     .past-event-card .admin-upload {
         flex: none;
-        width: 9rem;
+        width: 100%;
     }
 
     .photo-gallery {
