@@ -259,7 +259,7 @@
         }
 
         /* Compact editors keep manual ordering available while closed. */
-        .event-row { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 0.5rem; align-items: start; padding: 1rem 0; }
+        .event-row { display: grid; grid-template-columns: minmax(0, 1fr) 92px; gap: 0.5rem; align-items: start; padding: 1rem 0; }
         .entry-details { border: 1px solid #e8dcdc; border-radius: 0.8rem; overflow: hidden; }
         .entry-summary { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; cursor: pointer; }
         .entry-summary::after { content: 'Details +'; margin-left: auto; flex-shrink: 0; font-size: 0.8rem; color: #8f3b3b; }
@@ -274,8 +274,8 @@
         .entry-editor .event-thumb { width: min(320px, 100%); height: auto; aspect-ratio: 4 / 3; }
         .entry-editor .event-photo input[type="file"] { width: 100%; font-size: 0.85rem; }
         .entry-editor .field-row { flex-direction: column; }
-        .event-row-actions { flex-direction: column; flex-wrap: nowrap; margin-top: 0; gap: 0.25rem; }
-        .event-row-actions button { min-height: 44px; }
+        .event-row-actions { display: grid; grid-template-columns: repeat(2, 44px); grid-template-rows: repeat(2, 44px); margin-top: 0; gap: 4px; }
+        .event-row-actions button { width: 44px; height: 44px; padding: 0; border-radius: 0.4rem; font-size: 1.2rem; }
         .entry-editor > .remove-btn { align-self: flex-start; min-height: 44px; }
         button:disabled { opacity: 0.4; cursor: default; }
         .list-toolbar { margin: 0 0 0.75rem; }
@@ -346,7 +346,7 @@
             <div class="admin-panel" data-adminpanel="upcoming">
                 <div class="group">
                     <h2>Upcoming Events</h2>
-                    <p class="group-hint">Move entries to set their display order.</p>
+                    <p class="group-hint">Arrows: ⇈ move to top, ↑ move up one, ↓ move down one, ⇊ move to bottom. Save to keep the order.</p>
                     <div class="event-actions-row list-toolbar">
                         <button id="add-upcoming-btn" type="button" class="secondary-btn">+ Add Event</button>
                     </div>
@@ -362,7 +362,7 @@
             <div class="admin-panel" data-adminpanel="past">
                 <div class="group">
                     <h2>Past Events</h2>
-                    <p class="group-hint">Year is optional when included in the date.</p>
+                    <p class="group-hint">Year is optional when included in the date. Arrows: ⇈ move to top, ↑ move up one, ↓ move down one, ⇊ move to bottom. Moves apply within the selected year, or across all events when All is selected. Save to keep the order.</p>
                     <div class="year-subtabs" id="past-year-subtabs"></div>
                     <div class="event-actions-row list-toolbar">
                         <button id="add-past-btn" type="button" class="secondary-btn">+ Add Event</button>
@@ -379,7 +379,7 @@
             <div class="admin-panel" data-adminpanel="gallery">
                 <div class="group">
                     <h2>Photo Gallery</h2>
-                    <p class="group-hint">Choose 4:3, square, or portrait in Details.</p>
+                    <p class="group-hint">Choose 4:3, square, or portrait in Details. Arrows: ⇈ move to top, ↑ move up one, ↓ move down one, ⇊ move to bottom. Save to keep the order.</p>
                     <div class="event-actions-row list-toolbar">
                         <button id="add-gallery-btn" type="button" class="secondary-btn">+ Add Photo</button>
                     </div>
