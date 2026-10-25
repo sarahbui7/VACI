@@ -612,79 +612,46 @@
             return 4 / 3;
         }
 
-        // ---- Justified photo grid ----
-        // Lays out each row of .gallery-item elements so every photo in
-        // that row shares the same height and the row's photos, plus
-        // gaps, exactly fill the container's width — the classic
-        // "justified gallery" look. Different rows end up with
-        // different heights depending on how many photos land in them
-        // and how wide/tall those photos are.
+        // Each calculated row has its own container, so browser wrapping
+        // cannot split a row or shrink its photos independently.
         function layoutGallery() {
             const container = document.getElementById('photo-gallery');
             if (!container) return;
-
             const items = Array.from(container.querySelectorAll('.gallery-item'));
-            if (items.length === 0) return;
+            const containerWidth = container.getBoundingClientRect().width;
+            if (!items.length || containerWidth <= 0) return;
 
-            const containerWidth = container.clientWidth;
-            if (containerWidth <= 0) return;
-
-            const containerStyles = getComputedStyle(container);
-            const gap = parseFloat(containerStyles.columnGap || containerStyles.gap) || 16;
-            const targetHeight = parseFloat(containerStyles.getPropertyValue('--gallery-row-height')) || 220;
-            const maxHeight = targetHeight * 1.6; // cap so a sparse last row doesn't blow up
-
+            const styles = getComputedStyle(container);
+            const gap = parseFloat(styles.gap) || 16;
+            const targetHeight = parseFloat(styles.getPropertyValue('--gallery-row-height')) || 220;
+            const rows = document.createDocumentFragment();
             let row = [];
-            let rowAspectSum = 0;
+            let aspectSum = 0;
 
-            function flushRow(isLeftover) {
-                if (row.length === 0) return;
-
-                const totalGap = gap * (row.length - 1);
-                let rowHeight = (containerWidth - totalGap) / rowAspectSum;
-
-                // The final, incomplete row: stretching it to fill the
-                // width would make it awkwardly tall, so just use the
-                // target height and let it sit short of the edge.
-                if (isLeftover && rowHeight > maxHeight) {
-                    rowHeight = targetHeight;
-                }
-
-                let widths = row.map((item) => rowHeight * (parseFloat(item.dataset.aspect) || 4 / 3));
-
-                if (!isLeftover || rowHeight !== targetHeight) {
-                    // Round to whole pixels, then push any rounding
-                    // remainder onto the last item so the row's total
-                    // width lines up exactly with the container —
-                    // otherwise sub-pixel drift can wrap an item early.
-                    const rounded = widths.map((w) => Math.round(w));
-                    const target = Math.round(containerWidth - totalGap);
-                    const drift = target - rounded.reduce((a, b) => a + b, 0);
-                    rounded[rounded.length - 1] += drift;
-                    widths = rounded;
-                }
-
-                row.forEach((item, i) => {
-                    item.style.height = rowHeight + 'px';
-                    item.style.width = Math.max(widths[i], 40) + 'px';
+            function flushRow() {
+                if (!row.length) return;
+                const rowEl = document.createElement('div');
+                rowEl.className = 'gallery-row';
+                const availableWidth = Math.max(1, containerWidth - gap * (row.length - 1));
+                const height = availableWidth / aspectSum;
+                row.forEach(item => {
+                    const aspect = parseFloat(item.dataset.aspect) || 4 / 3;
+                    item.style.width = (availableWidth * aspect / aspectSum) + 'px';
+                    item.style.height = height + 'px';
+                    rowEl.appendChild(item);
                 });
-
+                rows.appendChild(rowEl);
                 row = [];
-                rowAspectSum = 0;
+                aspectSum = 0;
             }
 
-            items.forEach((item) => {
-                const aspect = parseFloat(item.dataset.aspect) || 4 / 3;
+            items.forEach(item => {
                 row.push(item);
-                rowAspectSum += aspect;
-
-                const widthAtTarget = rowAspectSum * targetHeight + gap * (row.length - 1);
-                if (widthAtTarget >= containerWidth) {
-                    flushRow(false);
-                }
+                aspectSum += parseFloat(item.dataset.aspect) || 4 / 3;
+                if (aspectSum * targetHeight + gap * (row.length - 1) >= containerWidth) flushRow();
             });
-
-            flushRow(true);
+            flushRow();
+            container.replaceChildren(rows);
         }
 
         // Re-run the layout whenever the gallery's own box size changes —

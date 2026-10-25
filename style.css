@@ -410,9 +410,16 @@ a {
        place instead of duplicating a pixel value in the script. */
     --gallery-row-height: 220px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 1rem;
-    align-items: flex-start;
+    align-items: stretch;
+}
+
+.gallery-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: inherit;
+    width: 100%;
 }
 
 .gallery-item {
@@ -420,6 +427,7 @@ a {
        real justified rows (also the size used if JS ever fails). */
     height: var(--gallery-row-height);
     width: calc(var(--gallery-row-height) * 4 / 3);
+    flex: 0 0 auto;
     border: 0;
     padding: 0;
     background: repeating-linear-gradient(135deg, rgba(59,64,143,0.03) 0 10px, rgba(59,64,143,0.06) 10px 20px);
