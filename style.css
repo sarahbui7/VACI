@@ -1069,7 +1069,8 @@ a {
 
     .past-event-card {
         flex-direction: column;
-        text-align: center;
+        align-items: flex-start;
+        text-align: left;
     }
 
     .past-event-card .admin-upload {
