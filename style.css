@@ -83,11 +83,10 @@ a {
 }
 
 .nav-brand .mark {
-    width: 3rem;
-    height: 3rem;
+    width: 4.5rem;
+    height: 4.5rem;
     flex-shrink: 0;
     border-radius: 50%;
-    border: 2px solid var(--gold);
     padding: 2px;
     background: #000;
     object-fit: contain;
