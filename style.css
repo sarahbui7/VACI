@@ -87,7 +87,10 @@ a {
     height: 2.1rem;
     flex-shrink: 0;
     border-radius: 50%;
-    object-fit: cover;
+    border: 2px solid var(--gold);
+    padding: 2px;
+    background: #000;
+    object-fit: contain;
     aspect-ratio: 1 / 1;
 }
 
