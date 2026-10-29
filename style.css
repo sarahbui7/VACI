@@ -33,7 +33,7 @@ html {
 body {
     font-family: var(--body);
     color: var(--text);
-    background: var(--bg);
+    background: var(--bg) url('images/bg.webp') center top / 945px 945px repeat;
     min-height: 100vh;
     padding-top: var(--nav-height, 5.2rem);
     line-height: 1.6;
